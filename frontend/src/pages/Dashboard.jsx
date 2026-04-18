@@ -7,7 +7,7 @@
 // export default function Dashboard(){
 //     const[data,setData]=useState(null)
 //     useEffect(()=>{
-//         axios.get("http://localhost:4000/api/dashboard")
+//         axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/dashboard")
 //         .then((response)=>{
 //             console.log(response.data)
 //             setData(response.data)
@@ -49,7 +49,7 @@ export default function Dashboard() {
   const fetchUserOrders = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get("http://localhost:4444/api/user-orders", {
+      const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/user-orders", {
         headers: { authorization: token }
       })
       setUserOrders(response.data)
@@ -62,7 +62,7 @@ export default function Dashboard() {
   const trackOrder = async (orderId, orderNumber) => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get(`http://localhost:4444/api/activity?orderNumber=${orderNumber}`, {
+      const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/activity?orderNumber=${orderNumber}`, {
         headers: { authorization: token }
       })
       setSelectedOrder(orderId)
@@ -104,7 +104,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    axios.get("http://localhost:4444/api/dashboard", {
+    axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/dashboard", {
       headers: { authorization: token }
     })
       .then((response) => {

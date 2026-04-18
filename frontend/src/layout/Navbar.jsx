@@ -11,9 +11,12 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar__inner">
-        <div>
-          <h1 className="navbar__title">Warehouse Management</h1>
-          <p className="navbar__subtitle">Fast access to orders, stock, and locations</p>
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Adhi Warehouse" className="h-10 w-10 object-contain" />
+          <div>
+            <h1 className="navbar__title">Adhi Warehouse</h1>
+            <p className="navbar__subtitle">Fast access to orders, stock, and locations</p>
+          </div>
         </div>
 
         <div className="navbar__search">

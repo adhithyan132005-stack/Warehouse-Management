@@ -12,7 +12,7 @@ export default function StockIn() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        axios.get("http://localhost:4444/api/product", {
+        axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/product", {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -20,7 +20,7 @@ export default function StockIn() {
             .then(res => setProducts(res.data))
             .catch(err => console.log(err))
         
-        axios.get("http://localhost:4444/api/locations", {
+        axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/locations", {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -47,7 +47,7 @@ export default function StockIn() {
             data.locationId = locationId
         }
         
-        axios.post("http://localhost:4444/api/stock-in", data, {
+        axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/stock-in", data, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

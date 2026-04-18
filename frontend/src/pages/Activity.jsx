@@ -11,7 +11,7 @@ export default function Activity(){
     const fetchActivities=async()=>{
         try{
             const token = localStorage.getItem('token');
-            const response=await axios.get("http://localhost:4444/api/activity", {
+            const response=await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/activity", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

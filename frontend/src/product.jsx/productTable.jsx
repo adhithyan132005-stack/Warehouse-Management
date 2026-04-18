@@ -12,7 +12,7 @@ export default function ProductTable({ refreshTrigger }) {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get("http://localhost:4444/api/product", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/product", {
                 headers: { authorization: localStorage.getItem('token') }
             });
             setProducts(response.data);
@@ -24,7 +24,7 @@ export default function ProductTable({ refreshTrigger }) {
     const deleteProduct = async (id) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
-                await axios.delete(`http://localhost:4444/api/product/${id}`, {
+                await axios.delete(`https://warehouse-management-backend-t3q2.onrender.com/api/product/${id}`, {
                     headers: { authorization: localStorage.getItem('token') }
                 });
                 fetchProducts();
@@ -38,7 +38,7 @@ export default function ProductTable({ refreshTrigger }) {
         const newName = prompt("Edit name", product.name);
         if (newName && newName !== product.name) {
             try {
-                await axios.put(`http://localhost:4444/api/product/${product._id}`, { ...product, name: newName }, {
+                await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/product/${product._id}`, { ...product, name: newName }, {
                     headers: { authorization: localStorage.getItem('token') }
                 });
                 fetchProducts();

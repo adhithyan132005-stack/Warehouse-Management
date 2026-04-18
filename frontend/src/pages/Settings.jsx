@@ -16,7 +16,7 @@ export default function Settings() {
     const fetchUser = async () => {
         try {
             const token = localStorage.getItem("token")
-            const response = await axios.get("http://localhost:4444/api/account", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/account", {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setUser(response.data)
@@ -33,7 +33,7 @@ export default function Settings() {
         setMessage("")
         try {
             const token = localStorage.getItem("token")
-            await axios.put("http://localhost:4444/api/account", formData, {
+            await axios.put("https://warehouse-management-backend-t3q2.onrender.com/api/account", formData, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setMessage("Profile updated successfully! ✅")

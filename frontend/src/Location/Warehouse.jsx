@@ -6,13 +6,13 @@ export default function Wrehouse(){
     const[open,setOpen]=useState(false)
 
     useEffect(()=>{
-        axios.get("http://localhost:4444/api/locations")
+        axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/locations")
         .then(response=>{
             setLocations(response.data)
         })
     },[])
     const handleClick=async(id)=>{
-        const response=await axios.get(`http://localhost:4444/api/inventory/${id}`)
+        const response=await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/inventory/${id}`)
         setProducts(response.data)
         setOpen(true)
     }

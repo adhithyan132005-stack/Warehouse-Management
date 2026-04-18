@@ -28,7 +28,7 @@ export default function CreateOrder(){
     const fetchProducts=async()=>{
         try{
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://localhost:4444/api/product", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/product", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -78,7 +78,7 @@ export default function CreateOrder(){
                 quantity,
                 price: product.price
             }]
-            const response = await axios.post("http://localhost:4444/api/orders", { customerName, items }, {
+            const response = await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/orders", { customerName, items }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -124,7 +124,7 @@ export default function CreateOrder(){
                     <div key={product._id} className="product-card">
                         {product.image ? (
                             <img
-                                src={`http://localhost:4444/uploads/${product.image}`}
+                                src={`https://warehouse-management-backend-t3q2.onrender.com/uploads/${product.image}`}
                                 alt={product.name}
                                 className="product-image"
                             />

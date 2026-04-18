@@ -16,7 +16,7 @@ export default function Barcode() {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post("http://localhost:4444/api/product", formData, {
+            await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/product", formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -36,7 +36,7 @@ export default function Barcode() {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:4444/api/barcode?code=${encodeURIComponent(code)}`, {
+            const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/barcode?code=${encodeURIComponent(code)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

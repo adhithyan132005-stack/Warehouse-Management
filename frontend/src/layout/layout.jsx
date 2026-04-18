@@ -1,4 +1,4 @@
-﻿import Sidebar from "./sidebar"
+import Sidebar from "./sidebar"
 import Navbar from "./Navbar"
 
 export default function Layout({ children, role }) {

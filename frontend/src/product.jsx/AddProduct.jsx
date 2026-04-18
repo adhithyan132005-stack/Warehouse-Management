@@ -37,7 +37,7 @@ export default function AddProduct({close,refresh}){
   try {
     const token = localStorage.getItem('token');
     const res = await axios.get(
-      `http://localhost:4444/api/barcode/${code}`, {
+      `https://warehouse-management-backend-t3q2.onrender.com/api/barcode/${code}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -84,7 +84,7 @@ export default function AddProduct({close,refresh}){
             formData.append("image", form.image)
         }
 
-        await axios.post("http://localhost:4444/api/product", formData, {
+        await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/product", formData, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

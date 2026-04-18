@@ -29,9 +29,9 @@ export default function Search() {
 
             // Fetch all and filter client side for simplicity, ideally backend gives search APIs
             const [prodRes, orderRes, supRes] = await Promise.all([
-                axios.get("http://localhost:4444/api/product", { headers }).catch(() => ({ data: [] })),
-                axios.get("http://localhost:4444/api/orders", { headers }).catch(() => ({ data: [] })),
-                axios.get("http://localhost:4444/api/suppliers", { headers }).catch(() => ({ data: [] })),
+                axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/product", { headers }).catch(() => ({ data: [] })),
+                axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/orders", { headers }).catch(() => ({ data: [] })),
+                axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/suppliers", { headers }).catch(() => ({ data: [] })),
             ])
 
             setProducts(prodRes.data.filter(p => 

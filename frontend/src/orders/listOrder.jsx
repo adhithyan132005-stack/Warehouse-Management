@@ -9,7 +9,7 @@
 //     const fetchOrders=async()=>{
 //         try{
 //             const token = localStorage.getItem('token');
-//             const response=await axios.get("http://localhost:4444/api/orders", {
+//             const response=await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/orders", {
 //                 headers: {
 //                     'Authorization': `Bearer ${token}`
 //                 }
@@ -27,7 +27,7 @@
 //     const updateStatus=async(id,status)=>{
 //         try{
 //             const token = localStorage.getItem('token');
-//             await axios.put(`http://localhost:4444/api/orders/${id}`,{status}, {
+//             await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}`,{status}, {
 //                 headers: {
 //                     'Authorization': `Bearer ${token}`
 //                 }
@@ -139,7 +139,7 @@
 //     const fetchPickList=async(id)=>{
 //         try{
 //             const token = localStorage.getItem('token');
-//             const response=await axios.get(`http://localhost:4444/api/orders/${id}/picklist`, {
+//             const response=await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}/picklist`, {
 //                 headers: {
 //                     'Authorization': `Bearer ${token}`
 //                 }
@@ -234,7 +234,7 @@ export default function ListOrder(){
     const fetchOrders = async () => {
         try{
             const token = localStorage.getItem('token');
-            const response = await axios.get("http://localhost:4444/api/orders", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/orders", {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setOrders(response.data)
@@ -250,7 +250,7 @@ export default function ListOrder(){
     const updateStatus = async (id, status) => {
         try{
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:4444/api/orders/${id}`, { status }, {
+            await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             fetchOrders()
@@ -262,7 +262,7 @@ export default function ListOrder(){
     const fetchPickList = async (id) => {
         try{
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:4444/api/orders/${id}/picklist`, {
+            const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}/picklist`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setPickList(response.data)
