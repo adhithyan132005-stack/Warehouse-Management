@@ -105,8 +105,12 @@ stockCltr.getExpiryAlert=async(req,res)=>{
         }).populate("productId").populate("locationId")
 
         res.json(items)
-    }catch(err){
-        res.status(500).json({message:err.message})
+    } catch (err) {
+        console.error('CRITICAL ERROR in getExpiryAlert:', {
+            message: err.message,
+            stack: err.stack
+        })
+        res.status(500).json({ message: 'Internal Server Error in getExpiryAlert', details: err.message })
     }
 }
 module.exports=stockCltr
