@@ -24,12 +24,15 @@ export default function Sidebar({ role, onClose }) {
     <aside className="min-h-screen w-72 max-w-[18rem] overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-[#00A19B] via-[#00a19b] to-[#04715e] p-6 text-[#000000] shadow-2xl shadow-[#00A19B]/20 backdrop-blur-xl">
       <div className="mb-8 space-y-3">
         <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Adhi Warehouse" className="h-12 w-12 object-contain" />
           <div className="space-y-1">
-            <h2 className="text-3xl font-extrabold tracking-tight text-black drop-shadow-[0_2px_12px_rgba(0,0,0,0.18)]" style={{ color: '#000000' }}>
-              WareOS
+            <h2 className="text-2xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.18)]">
+              Adhi Warehouse
             </h2>
-            <p className="text-sm text-black/70">Control Center</p>
+            <p className="text-sm text-white/70">Control Center</p>
           </div>
+        </div>
           <button
             type="button"
             onClick={onClose}

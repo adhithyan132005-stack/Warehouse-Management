@@ -21,7 +21,7 @@ export default function PaymentPage(){
         const fetchOrder = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:4444/api/user-orders`, {
+                const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/user-orders`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 const foundOrder = response.data.find(o => o._id === id)
@@ -52,7 +52,7 @@ export default function PaymentPage(){
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:4444/api/orders/${id}`, {
+            await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}`, {
                 status: "paid"
             }, {
                 headers: { Authorization: `Bearer ${token}` }

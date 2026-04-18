@@ -13,7 +13,7 @@ export default function WarehouseVisualizer() {
   // Fetch all warehouse locations
   const fetchLocations = async () => {
     try {
-      const response = await axios.get("http://localhost:4444/api/locations", {
+      const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/locations", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       
@@ -46,7 +46,7 @@ export default function WarehouseVisualizer() {
     setRackProducts([]);
     
     try {
-      const response = await axios.get(`http://localhost:4444/api/inventory/location/${rack._id}`, {
+      const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/inventory/location/${rack._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setRackProducts(response.data);

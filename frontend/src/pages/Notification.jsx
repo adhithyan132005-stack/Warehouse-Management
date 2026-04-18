@@ -23,7 +23,7 @@ export default function Notification(){
     const fetchAlerts=async()=>{
         try{
             const token = localStorage.getItem('token');
-            const response=await axios.get("http://localhost:4444/api/expiry-alert", {
+            const response=await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/expiry-alert", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

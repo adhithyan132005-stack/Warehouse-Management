@@ -31,7 +31,7 @@ export default function OrderTracking() {
         setError("")
         try {
             console.log("🔍 Searching for order:", searchTerm)
-            const response = await axios.get("http://localhost:4444/api/activity", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/activity", {
                 params: { orderNumber: searchTerm },
                 headers: { authorization: localStorage.getItem('token') }
             })

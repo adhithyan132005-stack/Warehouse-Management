@@ -12,7 +12,7 @@ export default function AddLocation(){
         }
         try{
             const token = localStorage.getItem('token');
-            await axios.post("http://localhost:4444/api/locations",{zone,rackNumber,capacity:Number(capacity)}, {
+            await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/locations",{zone,rackNumber,capacity:Number(capacity)}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

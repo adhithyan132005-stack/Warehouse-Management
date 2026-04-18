@@ -13,7 +13,7 @@ export default function UserNotifications() {
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get("http://localhost:4444/api/notifications", {
+      const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/notifications", {
         headers: { authorization: token }
       })
       setNotifications(response.data)
@@ -26,7 +26,7 @@ export default function UserNotifications() {
   const markAsRead = async (notificationId) => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:4444/api/notifications/${notificationId}/read`, {}, {
+      await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/notifications/${notificationId}/read`, {}, {
         headers: { authorization: token }
       })
       // Update local state
@@ -42,7 +42,7 @@ export default function UserNotifications() {
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put("http://localhost:4444/api/notifications/mark-all-read", {}, {
+      await axios.put("https://warehouse-management-backend-t3q2.onrender.com/api/notifications/mark-all-read", {}, {
         headers: { authorization: token }
       })
       setNotifications(notifications.map(n => ({ ...n, isRead: true })))

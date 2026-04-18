@@ -9,7 +9,7 @@ export default function Suppliers() {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await axios.get("http://localhost:4444/api/suppliers", {
+        const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/suppliers", {
           headers: { authorization: localStorage.getItem('token') }
         })
         setSuppliers(response.data)

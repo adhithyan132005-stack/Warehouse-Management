@@ -12,7 +12,7 @@ export default function Users() {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:4444/api/users", {
+            const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/users", {
                 headers: { authorization: localStorage.getItem('token') }
             })
             setUsers(response.data)
@@ -26,7 +26,7 @@ export default function Users() {
 
     const updateRole = async (userId, newRole) => {
         try {
-            await axios.put(`http://localhost:4444/api/users/${userId}/role`, { role: newRole }, {
+            await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/users/${userId}/role`, { role: newRole }, {
                 headers: { authorization: localStorage.getItem('token') }
             })
             fetchUsers() // Refresh list
