@@ -5,7 +5,7 @@ activityController.getActivities = async (req, res) => {
     try {
         console.log('Fetching activities...')
         const { orderNumber } = req.query
-        
+
         if (!orderNumber || !orderNumber.trim()) {
             const activities = await Activity.find({ type: 'order' })
                 .sort({ createdAt: -1 })
@@ -15,7 +15,7 @@ activityController.getActivities = async (req, res) => {
 
         const searchTerm = orderNumber.trim()
         console.log('Searching for orderNumber:', searchTerm)
-        
+
         // Search with multiple strategies to handle both old and new data
         const query = {
             $or: [
@@ -30,7 +30,7 @@ activityController.getActivities = async (req, res) => {
         const activities = await Activity.find(query)
             .sort({ createdAt: -1 })
             .populate('orderId')
-        
+
         console.log('Activities found:', activities.length)
         console.log('Search term:', searchTerm)
         console.log('Activities:', activities)

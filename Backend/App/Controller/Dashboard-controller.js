@@ -7,10 +7,10 @@ const dashboardController = {};
 dashboardController.getdashbaordstats = async (req, res) => {
     try {
         const totalProducts = await Product.countDocuments();
-        
+
         const inventoryData = await Inventory.find();
         let lowStockCount = 0;
-        
+
         inventoryData.forEach(item => {
             if (item.quantity > 0 && item.quantity < 10) {
                 lowStockCount++;

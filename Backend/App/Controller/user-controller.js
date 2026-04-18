@@ -62,6 +62,17 @@ Usercltr.Account=async(req,res)=>{
     }
 }
 
+Usercltr.updateAccount=async(req,res)=>{
+    try{
+        const { username, email } = req.body;
+        const user = await User.findByIdAndUpdate(req.userId, { username, email }, { new: true }).select('-password');
+        res.json(user);
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong...'})
+    }
+}
+
 Usercltr.listUsers=async(req,res)=>{
     try{
         const users=await User.find().select('-password')

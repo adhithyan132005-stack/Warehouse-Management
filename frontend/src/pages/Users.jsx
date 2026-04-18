@@ -43,13 +43,13 @@ export default function Users() {
         <div>
             <h2>User Management</h2>
             <p>Manage user roles (admin can set users to staff)</p>
-            <table className="styled-table">
+            <table className="styled-table text-slate-950 bg-white">
                 <thead>
                     <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Current Role</th>
-                        <th>Actions</th>
+                        <th className="text-slate-950">Username</th>
+                        <th className="text-slate-950">Email</th>
+                        <th className="text-slate-950">Current Role</th>
+                        <th className="text-slate-950">Actions</th>
                     </tr>
                 </thead>
                 <tbody>

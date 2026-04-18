@@ -1,12 +1,34 @@
 const Product=require("../Model/product-model")
 const productController={}
 productController.create=async(req,res)=>{
-    const body=req.body
+    const { name, sku, category, price } = req.body
+    if (!name || !sku || !category || !price) {
+        return res.status(400).json({ error: 'name, sku, category and price are required' })
+    }
+
     try{
-        const product=await Product.create(body)
+          const product = new Product({
+            name: req.body.name,
+            sku: req.body.sku,
+            barcode: req.body.barcode,
+            category: req.body.category,
+            price: req.body.price,
+            description: req.body.description,
+            image: req.file ? req.file.filename : null
+        })
+
+        await product.save()
         res.status(201).json({message:"product created successfully",product})
 
     }catch(err){
+        console.error('Product create error:', err)
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ error: err.message })
+        }
+        if (err.code === 11000) {
+            const field = Object.keys(err.keyValue)[0]
+            return res.status(409).json({ error: `${field} already exists` })
+        }
         res.status(500).json({error:err.message})
     }
 }
@@ -48,9 +70,9 @@ productController.delete=async(req,res)=>{
 }
 productController.barcode=async(req,res)=>{
     try{
-        const code = req.query.code
+        const code = req.params.code || req.query.code
         if (!code) {
-            return res.status(400).json({message:"barcode code query is required"})
+            return res.status(400).json({message:"barcode code is required"})
         }
 
         const products = await Product.findOne({barcode: code})

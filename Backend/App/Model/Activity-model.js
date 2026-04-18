@@ -3,11 +3,15 @@ const activitySchema=new mongoose.Schema({
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Order",
-        required: true
+        required: function() {
+            return this.type === 'order'
+        }
     },
     orderNumber: {
         type: String,
-        required: true
+        required: function() {
+            return this.type === 'order'
+        }
     },
     message: String,
     type: String,

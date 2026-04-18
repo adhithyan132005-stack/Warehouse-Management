@@ -1,5 +1,6 @@
 require('dotenv').config();
 const cors = require('cors');
+const path = require('path')
 const AuthenticateUser = require("./App/Middleware/user-authenticate")
 const AuthorizeUser = require("./App/Middleware/user-authorize")
 const Usercltr = require("./App/Controller/user-controller")
@@ -20,6 +21,7 @@ const app = express();
 
 app.use(cors())
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 configureDB();
 
@@ -27,6 +29,7 @@ configureDB();
 app.post("/api/users", Usercltr.Register)
 app.post("/api/login", Usercltr.Login)
 app.get("/api/account", AuthenticateUser, Usercltr.Account)
+app.put("/api/account", AuthenticateUser, Usercltr.updateAccount)
 app.get("/api/users", AuthenticateUser, AuthorizeUser(["admin"]), Usercltr.listUsers)
 app.put("/api/users/:id/role", AuthenticateUser, AuthorizeUser(["admin"]), Usercltr.updateRole)
 
