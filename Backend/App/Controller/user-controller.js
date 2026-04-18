@@ -28,29 +28,47 @@ Usercltr.Register=async(req,res)=>{
         res.status(201).json(user)
         }
 
-    }catch(err){
-        console.log(err)
-        res.status(500).json({error:'something went wrong..!'})
-
+    } catch (err) {
+        console.error('CRITICAL ERROR in Register:', {
+            message: err.message,
+            stack: err.stack,
+            body: req.body
+        })
+        res.status(500).json({ error: 'something went wrong during registration', details: err.message })
     }
 }
-Usercltr.Login=async(req,res)=>{
-    const body=req.body;
-    const{error,value}=LoginValidationSchema.validate(body,{abortEarly:false})
-    if(error){
-        return res.status(400).json({error:error.details.map(err=>err.message)})
+Usercltr.Login = async (req, res) => {
+    try {
+        const body = req.body;
+        const { error, value } = LoginValidationSchema.validate(body, { abortEarly: false })
+        if (error) {
+            return res.status(400).json({ error: error.details.map(err => err.message) })
+        }
+        const UserPresent = await User.findOne({ email: value.email })
+        if (!UserPresent) {
+            return res.status(400).json({ error: 'invalid email' })
+        }
+        const isPasswordMatch = await bcryptjs.compare(value.password, UserPresent.password)
+        if (!isPasswordMatch) {
+            return res.status(400).json({ error: "Invalid Password...!" })
+        }
+        
+        if (!process.env.JWT_SECRET) {
+            console.error('CRITICAL ERROR: JWT_SECRET environment variable is not defined!')
+            return res.status(500).json({ error: 'Server configuration error (JWT_SECRET missing)' })
+        }
+
+        const TokenData = { userId: UserPresent._id, role: UserPresent.role }
+        const token = jwt.sign(TokenData, process.env.JWT_SECRET, { expiresIn: '30d' })
+        res.json({ token: token, username: UserPresent.username })
+    } catch (err) {
+        console.error('CRITICAL ERROR in Login:', {
+            message: err.message,
+            stack: err.stack,
+            body: req.body
+        })
+        res.status(500).json({ error: 'Internal Server Error during Login', details: err.message })
     }
-    const UserPresent=await User.findOne({email:value.email})
-    if(!UserPresent){
-        return res.status(400).json({error:'invalid email'})
-    }
-    const isPasswordMatch=await bcryptjs.compare(value.password,UserPresent.password)
-    if(!isPasswordMatch){
-        return res.status(400).json({error:"Invalid Password...!"})
-    }
-    const TokenData={userId:UserPresent._id,role:UserPresent.role}
-    const token=jwt.sign(TokenData,process.env.JWT_SECRET,{expiresIn:'30d'})
-    res.json({token:token, username: UserPresent.username})
 }
 Usercltr.Account=async(req,res)=>{
     try{
