@@ -39,10 +39,16 @@ activityController.getActivities = async (req, res) => {
         console.error('CRITICAL ERROR in getActivities:', {
             message: err.message,
             stack: err.stack,
-            query: req.query
+            query: req.query,
+            dbState: mongoose.connection.readyState
         })
-        res.status(500).json({ message: 'Internal Server Error in getActivities', details: err.message })
+        res.status(500).json({ 
+            message: 'Internal Server Error in getActivities', 
+            details: err.message,
+            dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+        })
     }
 }
+
 
 module.exports = activityController
