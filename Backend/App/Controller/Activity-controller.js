@@ -36,8 +36,12 @@ activityController.getActivities = async (req, res) => {
         console.log('Activities:', activities)
         res.json(activities)
     } catch (err) {
-        console.error('Error in getActivities:', err)
-        res.status(500).json({ message: err.message })
+        console.error('CRITICAL ERROR in getActivities:', {
+            message: err.message,
+            stack: err.stack,
+            query: req.query
+        })
+        res.status(500).json({ message: 'Internal Server Error in getActivities', details: err.message })
     }
 }
 
