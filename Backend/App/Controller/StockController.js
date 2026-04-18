@@ -51,12 +51,13 @@ stockCltr.stockOut=async(req,res)=>{
             return res.status(400).json({message:"locationId is required"})
         }
         
-        const inventory=await Inventory.findOne({productId,locationId,quantity:{$gt:0}
+        const inventory=await Inventory.find({productId,locationId,quantity:{$gt:0}
         }).sort({expiryDate:1})
 
-        if(inventory.length===0){
+        if(!inventory || inventory.length===0){
             return res.status(404).json({message:"inventory not found"})
         }
+
         let remaining=Number(quantity)
         for(let inv of inventory){
             if(inv.expiryDate && new Date(inv.expiryDate)<new Date()){
@@ -108,9 +109,15 @@ stockCltr.getExpiryAlert=async(req,res)=>{
     } catch (err) {
         console.error('CRITICAL ERROR in getExpiryAlert:', {
             message: err.message,
-            stack: err.stack
+            stack: err.stack,
+            dbState: mongoose.connection.readyState
         })
-        res.status(500).json({ message: 'Internal Server Error in getExpiryAlert', details: err.message })
+        res.status(500).json({ 
+            message: 'Internal Server Error in getExpiryAlert', 
+            details: err.message,
+            dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+        })
     }
 }
+
 module.exports=stockCltr

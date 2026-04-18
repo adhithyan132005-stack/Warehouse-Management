@@ -65,11 +65,17 @@ Usercltr.Login = async (req, res) => {
         console.error('CRITICAL ERROR in Login:', {
             message: err.message,
             stack: err.stack,
-            body: req.body
+            body: req.body,
+            dbState: mongoose.connection.readyState
         })
-        res.status(500).json({ error: 'Internal Server Error during Login', details: err.message })
+        res.status(500).json({ 
+            error: 'Internal Server Error during Login', 
+            details: err.message,
+            dbStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+        })
     }
 }
+
 Usercltr.Account=async(req,res)=>{
     try{
     const user=await User.findOne({_id:req.userId})

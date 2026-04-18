@@ -7,14 +7,15 @@ const Usercltr = require("./App/Controller/user-controller")
 const configureDB = require("./config/db")
 const inventoryRoutes = require("./App/Routes/InventoryRoutes")
 const stockRoutes = require("./App/Routes/StockRoutes")
-const dashboardRoutes=require("./App/Routes/DashboardRoutes")
-const productRoutes=require("./App/Routes/productRoutes")
-const locationRoutes=require("./App/Routes/locationRoutes")
-const orderRoutes=require("./App/Routes/orderRoutes")
-const activityRoutes=require("./App/Routes/ActivityRoutes")
-const notificationRoutes=require("./App/Routes/notificationRoutes")
+const dashboardRoutes = require("./App/Routes/DashboardRoutes")
+const productRoutes = require("./App/Routes/productRoutes")
+const locationRoutes = require("./App/Routes/locationRoutes")
+const orderRoutes = require("./App/Routes/orderRoutes")
+const activityRoutes = require("./App/Routes/ActivityRoutes")
+const notificationRoutes = require("./App/Routes/notificationRoutes")
 const express = require('express');
 const mongoose = require('mongoose');
+
 const port = process.env.PORT || 4444;
 
 
@@ -35,9 +36,7 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-configureDB();
-
-
+// User Routes
 app.post("/api/users", Usercltr.Register)
 app.post("/api/login", Usercltr.Login)
 app.get("/api/account", AuthenticateUser, Usercltr.Account)
@@ -45,18 +44,30 @@ app.put("/api/account", AuthenticateUser, Usercltr.updateAccount)
 app.get("/api/users", AuthenticateUser, AuthorizeUser(["admin"]), Usercltr.listUsers)
 app.put("/api/users/:id/role", AuthenticateUser, AuthorizeUser(["admin"]), Usercltr.updateRole)
 
+// Feature Routes
 app.use("/api", inventoryRoutes)
 app.use("/api", stockRoutes)
-app.use("/api",dashboardRoutes)
-app.use("/api",productRoutes)
-app.use("/api",locationRoutes)
-app.use("/api",orderRoutes)
-app.use("/api",activityRoutes)
-app.use("/api",notificationRoutes)
+app.use("/api", dashboardRoutes)
+app.use("/api", productRoutes)
+app.use("/api", locationRoutes)
+app.use("/api", orderRoutes)
+app.use("/api", activityRoutes)
+app.use("/api", notificationRoutes)
 
-app.listen(port, () => {
 
-    console.log(`Warehouse server is running on port ${port} in production mode`)
-})
+async function startServer() {
+    try {
+        await configureDB();
+        app.listen(port, () => {
+            console.log(`Warehouse server is running on port ${port} and connected to database`)
+        })
+    } catch (err) {
+        console.error('FAILED TO START SERVER:', err.message);
+        process.exit(1);
+    }
+}
+
+startServer();
+
 
 
