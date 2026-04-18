@@ -2,7 +2,48 @@
   "hash": "486e2038",
   "configHash": "503cb7d1",
   "lockfileHash": "5bea868e",
-  "browserHash": "01a2c9f5",
-  "optimized": {},
-  "chunks": {}
+  "browserHash": "ff598cc0",
+  "optimized": {
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "4428b740",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "f17d20bd",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "556cba9c",
+      "needsInterop": true
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "3d33066e",
+      "needsInterop": false
+    },
+    "react-qr-barcode-scanner": {
+      "src": "../../node_modules/react-qr-barcode-scanner/dist/index.js",
+      "file": "react-qr-barcode-scanner.js",
+      "fileHash": "fb7abc0e",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-AU2MKR2E": {
+      "file": "chunk-AU2MKR2E.js"
+    },
+    "chunk-VX2H6PUQ": {
+      "file": "chunk-VX2H6PUQ.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
 }

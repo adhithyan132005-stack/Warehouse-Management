@@ -55,11 +55,12 @@ export default function StockOut() {
             <h3 className="auth-title" style={{ fontSize: '1.5rem', marginBottom: '24px' }}>Stock Out</h3>
             <form onSubmit={handleSubmit} className="auth-form">
                 <div className="form-group">
-                    <label>Select Product</label>
+                    <label className="form-label">Select Product</label>
                     <select
                         value={productId}
                         onChange={e => setproductId(e.target.value)}
                         required
+                        className="form-input"
                     >
                         <option value="">-- Choose Product --</option>
                         {products.map(p => (
@@ -68,11 +69,12 @@ export default function StockOut() {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label>Select Location</label>
+                    <label className="form-label">Select Location</label>
                     <select
                         value={locationId}
                         onChange={e => setlocationId(e.target.value)}
                         required
+                        className="form-input"
                     >
                         <option value="">-- Choose Location --</option>
                         {locations.map(l => (
@@ -81,16 +83,17 @@ export default function StockOut() {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label>Quantity</label>
+                    <label className="form-label">Quantity</label>
                     <input
                         type="number"
                         placeholder="Enter Quantity"
                         value={quantity}
                         onChange={e => setQuantity(e.target.value)}
                         required
+                        className="form-input"
                     />
                 </div>
-                <button className="auth-btn" style={{ background: 'var(--secondary)' }}>Remove from Stock →</button>
+                <button className="auth-btn btn btn--primary">Remove from Stock →</button>
             </form>
         </div>
     )

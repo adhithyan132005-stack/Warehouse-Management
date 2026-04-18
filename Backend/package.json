@@ -8,6 +8,8 @@
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.4",
+    "multer": "^2.1.1",
+    "razorpay": "^2.9.6",
     "react-qr-barcode-scanner": "^2.1.25"
   }
 }

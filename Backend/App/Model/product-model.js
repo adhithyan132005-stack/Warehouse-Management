@@ -21,12 +21,16 @@ const productSchema = new Schema({
     },
     barcode:{
         type:String,
-        required:true,
+        required:false,
 
     },
     description: {
         type: String
-    }
+    },
+    image:{
+        type:String,
+
+    },
 }, { timestamps: true });
 
 const Product = model('Product', productSchema);
