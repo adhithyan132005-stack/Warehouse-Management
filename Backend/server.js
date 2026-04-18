@@ -14,7 +14,8 @@ const orderRoutes=require("./App/Routes/orderRoutes")
 const activityRoutes=require("./App/Routes/ActivityRoutes")
 const notificationRoutes=require("./App/Routes/notificationRoutes")
 const express = require('express');
-const port = 4444;
+const mongoose = require('mongoose');
+const port = process.env.PORT || 4444;
 
 
 const app = express();
@@ -22,6 +23,17 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
+// Health Check Endpoint
+app.get("/api/health", (req, res) => {
+    const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+    res.json({
+        status: 'Server is running',
+        database: dbStatus,
+        port: port,
+        time: new Date().toISOString()
+    });
+});
 
 configureDB();
 
@@ -44,7 +56,7 @@ app.use("/api",notificationRoutes)
 
 app.listen(port, () => {
 
-    console.log(`warehouse server is running on port number ${port}`)
+    console.log(`Warehouse server is running on port ${port} in production mode`)
 })
 
 
