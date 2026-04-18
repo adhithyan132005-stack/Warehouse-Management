@@ -7,7 +7,7 @@ const configureDB = async function () {
             throw new Error('DB_URL environment variable is not defined!');
         }
         
-        // Log connection attempt (hiding password for safety)
+        
         const safeUrl = dbUrl.replace(/:([^@]+)@/, ':****@');
         console.log(`Attempting to connect to database: ${safeUrl}`);
 
@@ -29,9 +29,9 @@ const configureDB = async function () {
         } else if (err.message.includes('whitelist') || err.message.includes('IP')) {
             console.error('PROBABLE CAUSE: IP address not whitelisted in MongoDB Atlas');
         }
-        // Rethrowing allows the caller (server.js) to catch it during startup
+        
         throw err; 
     }
 }
 
-module.exports = configureDB;
+module.exports = configureDB;
