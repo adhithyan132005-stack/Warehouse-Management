@@ -40,10 +40,14 @@ export default function Login({ onLogin }) {
       onLogin(role)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password. Please try again.')
+      const errorData = err.response?.data
+      const errorMessage = errorData?.error || errorData?.details || errorData?.message || 'Invalid email or password. Please try again.'
+      const dbStatus = errorData?.dbStatus ? ` (DB State: ${errorData.dbStatus})` : ''
+      setError(`${errorMessage}${dbStatus}`)
     } finally {
       setLoading(false)
     }
+
   }
 
   return (

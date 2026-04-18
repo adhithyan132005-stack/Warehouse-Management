@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const cors = require('cors');
 const path = require('path')
 const AuthenticateUser = require("./App/Middleware/user-authenticate")
