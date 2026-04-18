@@ -10,7 +10,17 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('axios')) {
+              return 'vendor-axios';
+            }
+            if (id.includes('@zxing')) {
+              return 'vendor-barcode';
+            }
+            // Keep smaller libraries in a generic vendor chunk to avoid 'error' filename triggers
+            return 'vendor-libs';
           }
         }
       }
