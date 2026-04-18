@@ -46,7 +46,11 @@ dashboardController.getdashbaordstats = async (req, res) => {
             recentOperations: recentOperations.slice(0, 5)
         });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error('CRITICAL ERROR in getdashbaordstats:', {
+            message: err.message,
+            stack: err.stack
+        });
+        res.status(500).json({ message: 'Internal Server Error in dashboard stats', details: err.message });
     }
 };
 

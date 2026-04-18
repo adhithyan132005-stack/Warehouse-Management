@@ -164,8 +164,11 @@ orderController.getUserOrders = async (req, res) => {
         const orders = await Order.find({ userId }).populate("items.productId").sort({ createdAt: -1 })
         res.json(orders)
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ error: "Error fetching user orders" })
+        console.error('CRITICAL ERROR in getUserOrders:', {
+            message: err.message,
+            stack: err.stack
+        })
+        res.status(500).json({ error: "Error fetching user orders", details: err.message })
     }
 }
 
