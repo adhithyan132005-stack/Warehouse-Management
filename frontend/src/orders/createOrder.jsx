@@ -93,6 +93,13 @@ export default function CreateOrder(){
         }
     }
 
+    // Fix Image Visibility (Fixes Point #2 and #3 in your checklist)
+    const getImageUrl = (img) => {
+        if (!img) return "https://via.placeholder.com/300?text=No+Image";
+        if (img.startsWith("http")) return img;
+        return `https://warehouse-management-backend-t3q2.onrender.com/uploads/${img}`;
+    };
+
     return(
         <div className="order-container">
             <h2>Create Order</h2>
@@ -122,15 +129,14 @@ export default function CreateOrder(){
                     <p>No products available for this category.</p>
                 ) : visibleProducts.map((product) => (
                     <div key={product._id} className="product-card">
-                        {product.image ? (
+                        <div className="product-image-container">
                             <img
-                                src={`https://warehouse-management-backend-t3q2.onrender.com/uploads/${product.image}`}
+                                src={getImageUrl(product.image)}
                                 alt={product.name}
                                 className="product-image"
+                                onError={(e) => { e.target.src = "https://via.placeholder.com/300?text=Error+Loading+Image"; }}
                             />
-                        ) : (
-                            <div className="product-image-fallback">No image</div>
-                        )}
+                        </div>
                         <div className="product-details">
                             <h3>{product.name}</h3>
                             <p className="product-category">{product.category || 'Uncategorized'}</p>

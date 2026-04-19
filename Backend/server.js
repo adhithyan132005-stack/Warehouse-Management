@@ -23,7 +23,11 @@ const port = process.env.PORT || 4444;
 const app = express();
 
 app.use(cors({
-  origin: "https://warehouse-management-frontend-oup9.onrender.com",
+  origin: [
+    "https://warehouse-management-frontend-oup9.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000"
+  ],
   credentials: true
 }))
 app.use(express.json());
