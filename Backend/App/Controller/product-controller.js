@@ -50,12 +50,22 @@ productController.show=async(req,res)=>{
     }
 }
 productController.update=async(req,res)=>{
-    const body=req.body;
     const id=req.params.id
+    const body=req.body;
+    
+    // Add image if a new one was uploaded
+    if (req.file) {
+        body.image = req.file.filename
+    }
+
     try{
         const product=await Product.findByIdAndUpdate(id,body,{new:true})
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' })
+        }
         res.json(product)
     }catch(err){
+        console.error('Product update error:', err)
         res.status(500).json({error:err.message})
     }
 }

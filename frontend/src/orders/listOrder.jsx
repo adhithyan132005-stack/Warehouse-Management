@@ -272,6 +272,12 @@ export default function ListOrder(){
         }
     }
 
+    const getImageUrl = (img) => {
+        if (!img) return "https://via.placeholder.com/150?text=No+Img";
+        if (img.startsWith("http")) return img;
+        return `https://warehouse-management-backend-t3q2.onrender.com/uploads/${img}`;
+    };
+
     return(
         <div className="orders-container">
             <h1 className="orders-title">📦 Order Management</h1>
@@ -299,8 +305,14 @@ export default function ListOrder(){
 
                             <td>
                                 {order.items.map((item,i)=>(
-                                    <div key={i}>
-                                        {item.productId?.name} (x{item.quantity})
+                                    <div key={i} className="flex items-center gap-2 mb-1">
+                                        <img 
+                                            src={getImageUrl(item.productId?.image)} 
+                                            alt={item.productId?.name} 
+                                            className="w-8 h-8 rounded object-cover border border-slate-200"
+                                            onError={(e) => { e.target.src = "https://via.placeholder.com/50?text=Err"; }}
+                                        />
+                                        <span className="text-xs">{item.productId?.name} (x{item.quantity})</span>
                                     </div>
                                 ))}
                             </td>

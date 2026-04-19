@@ -3,6 +3,12 @@ import axios from "axios"
 import Barcode from "./barcode"
 
 export default function AddProduct({close,refresh}){
+    // Dynamic Backend URL detection
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const BASE_URL = isLocal 
+        ? "http://localhost:4444" 
+        : "https://warehouse-management-backend-t3q2.onrender.com";
+
     const[form,setForm]=useState({
         name:"",
         sku:"",
@@ -17,90 +23,67 @@ export default function AddProduct({close,refresh}){
     const [preview, setPreview] = useState(null)
     const handleImageChange=(e)=>{
       const file=e.target.files[0]
-      setForm({...form,image:file})
-      setPreview(URL.createObjectURL(file))
-
+      if (file) {
+          setForm({...form,image:file})
+          setPreview(URL.createObjectURL(file))
+      }
     }
     const handleChange=async(e)=>{
         setForm({...form,[e.target.name]:e.target.value})
-        
     }
     const handleBarcodeScan = async (code) => {
-  setShowScanner(false);
-
-  
-  setForm((prev) => ({
-    ...prev,
-    barcode: code
-  }));
-
-  try {
-    const token = localStorage.getItem('token');
-    const res = await axios.get(
-      `https://warehouse-management-backend-t3q2.onrender.com/api/barcode/${code}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+        setShowScanner(false);
+        setForm((prev) => ({ ...prev, barcode: code }));
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`${BASE_URL}/api/barcode/${code}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setForm({
+                name: res.data.name,
+                sku: res.data.sku,
+                barcode: res.data.barcode,
+                category: res.data.category,
+                price: res.data.price,
+                description: res.data.description
+            });
+        } catch (err) {
+            console.log("New product");
         }
-      }
-    );
+    };
 
-    
-    setForm({
-      name: res.data.name,
-      sku: res.data.sku,
-      barcode: res.data.barcode,
-      category: res.data.category,
-      price: res.data.price,
-      description: res.data.description
-    });
-
-  } catch (err) {
-    console.log("New product");
-  }
-};
     const handlesubmit = async (e) => {
-    e.preventDefault()
-
-    if (!form.name || !form.sku || !form.category || !form.price) {
-        seterror("All required fields must be filled")
-        return
-    }
-
-    try {
-        seterror("")
-        const token = localStorage.getItem('token')
-
-        const formData = new FormData()
-
-        formData.append("name", form.name)
-        formData.append("sku", form.sku)
-        if (form.barcode) {
-            formData.append("barcode", form.barcode)
-        }
-        formData.append("category", form.category)
-        formData.append("price", form.price)
-        formData.append("description", form.description)
-        if (form.image) {
-            formData.append("image", form.image)
+        e.preventDefault()
+        if (!form.name || !form.sku || !form.category || !form.price) {
+            seterror("All required fields must be filled")
+            return
         }
 
-        await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/product", formData, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        try {
+            seterror("")
+            const token = localStorage.getItem('token')
+            const formData = new FormData()
+            formData.append("name", form.name)
+            formData.append("sku", form.sku)
+            if (form.barcode) formData.append("barcode", form.barcode)
+            formData.append("category", form.category)
+            formData.append("price", form.price)
+            formData.append("description", form.description)
+            if (form.image) formData.append("image", form.image)
 
-        alert("product Added successfully")
+            await axios.post(`${BASE_URL}/api/product`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
 
-        if (refresh) refresh()
-        if (close) close()
-
-    } catch (err) {
-        console.error(err)
-        const message = err.response?.data?.error || err.response?.data?.message || err.message || "Something went wrong while adding the product"
-        seterror(message)
+            alert("Product Added Successfully")
+            if (refresh) refresh()
+            if (close) close()
+        } catch (err) {
+            console.error(err)
+            const message = err.response?.data?.error || err.response?.data?.message || err.message || "Something went wrong"
+            seterror(message)
+        }
     }
-}
     return(
         <div className="add-product-container">
             <div className="form-header">
@@ -209,4 +192,4 @@ export default function AddProduct({close,refresh}){
             </form>
         </div>
     )
-    }
+}
