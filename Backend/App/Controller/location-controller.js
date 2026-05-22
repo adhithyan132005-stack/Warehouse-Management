@@ -2,17 +2,6 @@ const Location = require("../Model/location-model")
 const Inventory=require("../Model/inventory-model")
 const locationController = {}
 
-// locationController.list = async (req, res) => {
-//     try {
-//         const locations = await Location.find()
-//         res.json(locations)
-//     } catch (err) {
-//         res.status(500).json({ error: err.message })
-//     }
-// }
-
-
-
 locationController.list = async (req, res) => {
     try {
         const locations = await Location.find()

@@ -8,7 +8,7 @@ const orderController = {}
 orderController.createOrder = async (req, res) => {
     try {
         const { customerName, items } = req.body
-        const userId = req.userId // Get user ID from authenticated user
+        const userId = req.userId 
         let totalAmount = 0
         const orderNumber = "ORD-" + Date.now()
         for (let item of items) {
@@ -78,7 +78,7 @@ orderController.updateStatus = async (req, res) => {
                 message: `Your order ${orderNum} has been packed and is ready for shipment`,
                 type: "order"
             })
-            // Create notification for the user
+            
             await Notification.create({
                 userId: orders.userId,
                 title: "Order Packed! 🎉",
@@ -93,7 +93,7 @@ orderController.updateStatus = async (req, res) => {
                 message: `Your order ${orderNum} has been shipped and is on its way to you`,
                 type: "order"
             })
-            // Create notification for the user
+        
             await Notification.create({
                 userId: orders.userId,
                 title: "Order Shipped! 🚚",
@@ -108,7 +108,7 @@ orderController.updateStatus = async (req, res) => {
                 message: `Your order ${orderNum} has been successfully delivered`,
                 type: "order"
             })
-            // Create notification for the user
+        
             await Notification.create({
                 userId: orders.userId,
                 title: "Order Delivered! ✅",
@@ -160,7 +160,7 @@ orderController.getPickList = async (req, res) => {
 
 orderController.getUserOrders = async (req, res) => {
     try {
-        const userId = req.userId // Get user ID from authenticated user
+        const userId = req.userId 
         const orders = await Order.find({ userId }).populate("items.productId").sort({ createdAt: -1 })
         res.json(orders)
     } catch (err) {

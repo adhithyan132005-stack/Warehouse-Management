@@ -9,6 +9,7 @@ inventoryController.createInventory=async(req,res)=>{
         res.json(inventory)
     }catch(err){
         res.status(500).json({message:err.message})
+        
     }
 }
 inventoryController.getallInventory=async(req,res)=>{

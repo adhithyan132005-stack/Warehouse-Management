@@ -281,11 +281,11 @@ export default function Dashboard() {
               <div className="space-y-4 p-4">
                 {userOrders && userOrders.length > 0 ? (
                   userOrders.map((order) => (
-                    <div key={order._id} className="bg-surface-800/40 border border-glass-border rounded-xl p-5 hover:bg-surface-800/80 transition-colors relative overflow-hidden">
+                    <div key={order._id} className="bg-slate-50 border border-slate-200 rounded-xl p-5 hover:bg-slate-100 transition-colors relative overflow-hidden shadow-sm">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                         <div>
-                          <h4 className="text-lg font-bold text-white mb-1">Order #{order.orderNumber}</h4>
-                          <p className="text-sm text-gray-400">{order.customerName}</p>
+                          <h4 className="text-lg font-bold text-slate-900 mb-1">Order #{order.orderNumber}</h4>
+                          <p className="text-sm text-slate-600 font-medium">{order.customerName}</p>
                         </div>
                         <div className="flex flex-col sm:items-end gap-2">
                           <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status?.toLowerCase() === 'delivered' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-500/20'}`}>
@@ -307,7 +307,7 @@ export default function Dashboard() {
                       {selectedOrder === order._id && (
                         <div className="mt-6 pt-6 border-t border-glass-border animate-fade-in space-y-6">
                             
-                          <div className={`p-4 rounded-xl border flex items-center gap-4 ${trackingInfo && trackingInfo[0]?.message.includes('delivered') ? 'bg-green-500/10 border-green-500/30' : 'bg-surface-900 border-glass-border'}`}>
+                          <div className={`p-4 rounded-xl border flex items-center gap-4 ${trackingInfo && trackingInfo[0]?.message.includes('delivered') ? 'bg-green-500/10 border-green-500/30' : 'bg-slate-100 border-slate-200'}`}>
                             <div className="text-3xl">
                               {trackingInfo?.[0]?.message.includes('delivered') ? '✅' :
                                trackingInfo?.[0]?.message.includes('shipped') ? '🚚' :
@@ -315,8 +315,8 @@ export default function Dashboard() {
                                trackingInfo?.[0]?.message.includes('processing') ? '🔄' : '📝'}
                             </div>
                             <div>
-                               <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Current Status</p>
-                               <p className={`font-bold text-lg ${trackingInfo && trackingInfo[0]?.message.includes('delivered') ? 'text-green-400' : 'text-white'}`}>
+                               <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">Current Status</p>
+                               <p className={`font-black text-lg ${trackingInfo && trackingInfo[0]?.message.includes('delivered') ? 'text-green-600' : 'text-slate-900'}`}>
                                   {trackingInfo && trackingInfo[0] ? (
                                     trackingInfo[0].message.includes('delivered') ? 'Delivered' :
                                     trackingInfo[0].message.includes('shipped') ? 'Shipped' :
@@ -329,14 +329,14 @@ export default function Dashboard() {
 
                           {/* Timeline */}
                           {trackingInfo && trackingInfo.length > 0 && (
-                             <div className="relative pl-6 border-l-2 border-surface-800 space-y-6 py-2">
+                             <div className="relative pl-6 border-l-2 border-slate-200 space-y-6 py-2">
                                {trackingInfo
                                   .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                                   .map((activity, index) => (
                                     <div key={index} className="relative">
-                                      <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-brand-500 ring-4 ring-surface-900"></div>
-                                      <p className="text-sm font-medium text-gray-200">{formatActivityMessage(activity.message, activity.createdAt || activity.timestamp)}</p>
-                                      <p className="text-xs text-gray-500 mt-1">{new Date(activity.createdAt || activity.timestamp).toLocaleTimeString()}</p>
+                                      <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white"></div>
+                                      <p className="text-sm font-bold text-slate-800">{formatActivityMessage(activity.message, activity.createdAt || activity.timestamp)}</p>
+                                      <p className="text-xs text-slate-400 mt-1">{new Date(activity.createdAt || activity.timestamp).toLocaleTimeString()}</p>
                                     </div>
                                ))}
                              </div>

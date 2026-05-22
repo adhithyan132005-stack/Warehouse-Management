@@ -16,12 +16,11 @@ activityController.getActivities = async (req, res) => {
         const searchTerm = orderNumber.trim()
         console.log('Searching for orderNumber:', searchTerm)
 
-        // Search with multiple strategies to handle both old and new data
+    
         const query = {
             $or: [
-                // Search in orderNumber field (new data structure)
+                
                 { orderNumber: { $regex: searchTerm, $options: 'i' } },
-                // Search in message field (old data or fallback)
                 { message: { $regex: searchTerm, $options: 'i' } }
             ],
             type: 'order'

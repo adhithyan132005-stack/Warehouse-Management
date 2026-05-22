@@ -53,7 +53,7 @@ productController.update=async(req,res)=>{
     const id=req.params.id
     const body=req.body;
     
-    // Add image if a new one was uploaded
+    
     if (req.file) {
         body.image = req.file.filename
     }
