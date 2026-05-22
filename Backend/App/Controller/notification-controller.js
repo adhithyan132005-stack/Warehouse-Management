@@ -12,6 +12,7 @@ notificationController.createNotification = async (userId, title, message, type 
             orderId
         })
         return notification
+        
     } catch (err) {
         console.error('Error creating notification:', err)
         throw err

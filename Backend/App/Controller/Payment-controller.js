@@ -14,7 +14,7 @@ exports.createOrder=async(req,res)=>{
         const{amount}=req.body
         
         if (!razorpay || process.env.RAZORPAY_KEY_ID === undefined) {
-             // Mock response for testing purpose
+            
              return res.json({
                  id: "order_mock_" + Date.now(),
                  amount: amount * 100,

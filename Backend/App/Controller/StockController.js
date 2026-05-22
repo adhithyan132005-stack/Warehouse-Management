@@ -3,7 +3,7 @@ const Activity=require("../Model/Activity-model")
 
 const product=require("../Model/product-model")
 const location=require("../Model/location-model")
-const Product = require("../Model/product-model")
+
 const stockCltr={}
 stockCltr.stockIn=async(req,res)=>{
     const{productId,locationId,quantity,batchNumber,expiryDate}=req.body
