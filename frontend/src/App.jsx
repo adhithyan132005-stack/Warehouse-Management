@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom"
-import Register from "./Register"
-import Login from "./login"
+import OTPRegister from "./auth/OTPRegister"
+import OTPLogin from "./auth/OTPLogin"
+import Home from "./pages/Home"
 import Dashboard from "./pages/Dashboard"
 import Layout from "./layout/layout"
 import Inventory from "./Inventory/Inventory"
@@ -48,9 +49,9 @@ export default function App() {
   return (
     <div className="app-root">
       <Routes>
-        <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
+        <Route path="/register" element={<OTPRegister />} />
+        <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
         <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />
