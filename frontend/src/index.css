@@ -1015,3 +1015,5 @@ button {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+\ n @ k e y f r a m e s   p u l s e - s l o w   { \ n     0 % ,   1 0 0 %   {   o p a c i t y :   0 . 2 ;   t r a n s f o r m :   s c a l e ( 1 ) ;   } \ n     5 0 %   {   o p a c i t y :   0 . 3 ;   t r a n s f o r m :   s c a l e ( 1 . 0 5 ) ;   } \ n } \ n \ n @ k e y f r a m e s   f a d e - i n - u p   { \ n     f r o m   { \ n         o p a c i t y :   0 ; \ n         t r a n s f o r m :   t r a n s l a t e Y ( 2 0 p x ) ; \ n     } \ n     t o   { \ n         o p a c i t y :   1 ; \ n         t r a n s f o r m :   t r a n s l a t e Y ( 0 ) ; \ n     } \ n } \ n \ n . a n i m a t e - p u l s e - s l o w   { \ n     a n i m a t i o n :   p u l s e - s l o w   6 s   e a s e - i n - o u t   i n f i n i t e ; \ n } \ n \ n . a n i m a t e - f a d e - i n - u p   { \ n     a n i m a t i o n :   f a d e - i n - u p   0 . 8 s   c u b i c - b e z i e r ( 0 . 1 6 ,   1 ,   0 . 3 ,   1 )   f o r w a r d s ; \ n     o p a c i t y :   0 ; \ n } \ n  
+ 
