@@ -182,7 +182,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Overview Top Bar */}
+      
       <div className="flex justify-between items-center px-2">
         <h2 className="text-xl font-bold text-sky-500">Dashboard Overview</h2>
         <div className="hidden lg:block relative z-30">
@@ -190,7 +190,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* KPI Tiles */}
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {userRole === 'user' ? (
           <>
@@ -265,10 +265,10 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Main Content Layout */}
+    
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left Column (Tables/Lists) */}
+        
         <div className="lg:col-span-2 glass-card rounded-2xl overflow-hidden flex flex-col">
           <div className="p-6 border-b border-glass-border">
             <h3 className="text-lg font-bold text-sky-500">
@@ -393,7 +393,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right Column (Activity/Widgets) */}
+        
         <div className="glass-card rounded-2xl p-6 flex flex-col relative z-20">
           {(userRole === 'admin' || userRole === 'staff') && (
             <div className="w-full">

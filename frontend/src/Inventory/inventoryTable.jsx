@@ -13,6 +13,7 @@ export default function InventoryTable() {
             const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/inventory", {
                 headers: { authorization: localStorage.getItem('token') }
             })
+            
             setdata(response.data)
             console.log(response.data)
         } catch (err) {
