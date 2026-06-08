@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { GoogleLogin } from "@react-oauth/google"
 
-export default function OTPRegister() {
+export default function OTPRegister({ onLogin }) {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ username: "", email: "", phone: "", password: "", confirmPassword: "" })
   const [method, setMethod] = useState("email") // "email" or "phone"
@@ -12,6 +13,33 @@ export default function OTPRegister() {
   const [error, setError] = useState("")
   const [countdown, setCountdown] = useState(0)
   const inputRefs = useRef([])
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("")
+    setLoading(true)
+    try {
+      const response = await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/auth/google", {
+        token: credentialResponse.credential
+      })
+      const token = response.data?.token
+      if (token) {
+        localStorage.setItem('token', token)
+        localStorage.setItem('userName', response.data.username || 'Warehouse')
+        localStorage.setItem('role', response.data.role || 'user')
+        
+        if (onLogin) onLogin(response.data.role || 'user')
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "Google sign in failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setError("Google authentication failed. Please try again.")
+  }
 
   useEffect(() => {
     let timer
@@ -133,7 +161,8 @@ export default function OTPRegister() {
 
         <div className="bg-slate-900/60 backdrop-blur-md shadow-glass border border-slate-700/50 rounded-2xl p-6 sm:p-8">
           {step === 1 && (
-            <form onSubmit={handleRequestOTP} className="space-y-4">
+            <>
+              <form onSubmit={handleRequestOTP} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
                 <input required type="text" name="username" value={formData.username} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="John Doe" />
@@ -186,7 +215,28 @@ export default function OTPRegister() {
                 {loading ? "Processing..." : `Send OTP to ${method === 'email' ? 'Email' : 'Phone'}`}
               </button>
             </form>
-          )}
+
+            <div className="relative my-6 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-700/80"></div>
+              </div>
+              <span className="relative px-3 bg-[#0f172a] text-xs text-slate-400 uppercase tracking-wider">
+                Or continue with
+              </span>
+            </div>
+
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="filled_blue"
+                size="large"
+                text="signup_with"
+                shape="rectangular"
+              />
+            </div>
+          </>
+        )}
 
           {step === 2 && (
             <form onSubmit={handleVerifyAndRegister} className="space-y-6">

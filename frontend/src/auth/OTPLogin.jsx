@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { GoogleLogin } from "@react-oauth/google"
 
 export default function OTPLogin({ onLogin }) {
   const [method, setMethod] = useState("email") // "email" or "phone"
@@ -12,6 +13,33 @@ export default function OTPLogin({ onLogin }) {
   const [countdown, setCountdown] = useState(0)
   const inputRefs = useRef([])
   const navigate = useNavigate()
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("")
+    setLoading(true)
+    try {
+      const response = await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/auth/google", {
+        token: credentialResponse.credential
+      })
+      const token = response.data?.token
+      if (token) {
+        localStorage.setItem('token', token)
+        localStorage.setItem('userName', response.data.username || 'Warehouse')
+        localStorage.setItem('role', response.data.role || 'user')
+        
+        onLogin(response.data.role || 'user')
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "Google sign in failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setError("Google authentication failed. Please try again.")
+  }
 
   useEffect(() => {
     let timer
@@ -201,6 +229,26 @@ export default function OTPLogin({ onLogin }) {
                   {loading ? "Sending..." : "Send Verification Code"}
                 </button>
               </form>
+
+              <div className="relative my-6 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-700/80"></div>
+                </div>
+                <span className="relative px-3 bg-[#0f172a] text-xs text-slate-400 uppercase tracking-wider">
+                  Or continue with
+                </span>
+              </div>
+
+              <div className="flex justify-center w-full">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="filled_blue"
+                  size="large"
+                  text="signin_with"
+                  shape="rectangular"
+                />
+              </div>
             </div>
           )}
 
