@@ -5,6 +5,7 @@ import axios from "axios"
 export default function OTPRegister() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ username: "", email: "", phone: "", password: "", confirmPassword: "" })
+  const [method, setMethod] = useState("email") // "email" or "phone"
   const [step, setStep] = useState(1) // 1: Details, 2: OTP Verification
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
@@ -24,21 +25,32 @@ export default function OTPRegister() {
 
   const handleRequestOTP = async (e) => {
     e.preventDefault()
+    
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.")
       return
     }
+    if (method === "phone" && !formData.phone) {
+      setError("Please enter a phone number to verify via SMS.")
+      return
+    }
+    
     setError("")
     setLoading(true)
 
     try {
-      // Send OTP to email before registering
-      await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/otp/send-email", { email: formData.email })
+      // Send OTP based on selected method
+      const endpoint = method === "email" ? "/api/otp/send-email" : "/api/otp/send-phone"
+      const payload = method === "email" ? { email: formData.email } : { phone: formData.phone }
+
+      await axios.post(`https://warehouse-management-backend-t3q2.onrender.com${endpoint}`, payload)
+      
       setStep(2)
       setCountdown(60)
       setTimeout(() => inputRefs.current[0]?.focus(), 100)
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to send verification code.")
+      setError(err.response?.data?.error || "Failed to send verification code. Check backend logs.")
     } finally {
       setLoading(false)
     }
@@ -56,13 +68,14 @@ export default function OTPRegister() {
 
     try {
       // 1. Verify OTP
+      const identifier = method === "email" ? formData.email : formData.phone;
       await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/otp/verify", {
-        identifier: formData.email,
+        identifier: identifier,
         otp: otpString,
-        type: "email"
+        type: method
       })
 
-      // 2. Register User (we pass phone now as well)
+      // 2. Register User
       await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/users", {
         username: formData.username,
         email: formData.email,
@@ -78,7 +91,7 @@ export default function OTPRegister() {
     }
   }
 
-  // OTP Handlers (Same as login)
+  // OTP Handlers
   const handleOtpChange = (index, value) => {
     if (value && !/^\d+$/.test(value)) return
     const newOtp = [...otp]
@@ -112,9 +125,9 @@ export default function OTPRegister() {
       <div className="w-full max-w-md z-10 transition-all duration-300">
         <div className="flex flex-col items-center justify-center mb-8">
           <img src="/logo.png" alt="Logo" className="w-20 h-20 mb-4 object-contain drop-shadow-glass" />
-          <h1 className="text-3xl font-bold text-white tracking-tight">{step === 1 ? "Create Account" : "Verify Email"}</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">{step === 1 ? "Create Account" : "Verify Identity"}</h1>
           <p className="text-slate-400 mt-2 text-center text-sm">
-            {step === 1 ? "Join Adhi Warehouse today." : `Code sent to ${formData.email}`}
+            {step === 1 ? "Join Adhi Warehouse today." : `Code sent to ${method === 'email' ? formData.email : formData.phone}`}
           </p>
         </div>
 
@@ -130,7 +143,7 @@ export default function OTPRegister() {
                 <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="you@example.com" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Phone Number <span className="text-slate-500 text-xs">(Optional)</span></label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Phone Number (Required for SMS verification)</label>
                 <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="+1234567890" />
               </div>
               <div>
@@ -142,10 +155,35 @@ export default function OTPRegister() {
                 <input required type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="••••••••" />
               </div>
 
+              {/* Method Selector at the bottom of the form */}
+              <div className="pt-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">How would you like to receive your verification code?</label>
+                <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50">
+                  <button
+                    type="button"
+                    onClick={() => setMethod("email")}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      method === "email" ? "bg-brand-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    Send to Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMethod("phone")}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      method === "phone" ? "bg-[#00A19B] text-white shadow" : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    Send to Phone
+                  </button>
+                </div>
+              </div>
+
               {error && <div className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg p-3 text-center">{error}</div>}
 
               <button type="submit" disabled={loading} className="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-lg transition-all mt-4">
-                {loading ? "Processing..." : "Continue"}
+                {loading ? "Processing..." : `Send OTP to ${method === 'email' ? 'Email' : 'Phone'}`}
               </button>
             </form>
           )}
