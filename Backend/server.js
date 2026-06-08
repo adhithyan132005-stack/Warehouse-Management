@@ -69,6 +69,11 @@ app.post("/api/otp/send-phone", OTPController.sendPhoneOTP);
 app.post("/api/otp/verify", OTPController.verifyOTP);
 app.post("/api/otp/login", OTPController.otpLogin);
 
+// Google OAuth Routes
+const GoogleAuthController = require("./App/Controller/google-auth-controller");
+app.post("/api/auth/google", GoogleAuthController.verifyGoogleLogin);
+
+
 
 async function startServer() {
     try {
