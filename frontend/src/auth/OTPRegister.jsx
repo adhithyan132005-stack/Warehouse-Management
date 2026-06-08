@@ -6,7 +6,7 @@ import { GoogleLogin } from "@react-oauth/google"
 export default function OTPRegister({ onLogin }) {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ username: "", email: "", phone: "", password: "", confirmPassword: "" })
-  const [method, setMethod] = useState("email") // "email" or "phone"
+  const [method, setMethod] = useState("phone") // "email" or "phone"
   const [step, setStep] = useState(1) // 1: Details, 2: OTP Verification
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
@@ -155,7 +155,7 @@ export default function OTPRegister({ onLogin }) {
           <img src="/logo.png" alt="Logo" className="w-20 h-20 mb-4 object-contain drop-shadow-glass" />
           <h1 className="text-3xl font-bold text-white tracking-tight">{step === 1 ? "Create Account" : "Verify Identity"}</h1>
           <p className="text-slate-400 mt-2 text-center text-sm">
-            {step === 1 ? "Join Adhi Warehouse today." : `Code sent to ${method === 'email' ? formData.email : formData.phone}`}
+            {step === 1 ? "Join Adhi Warehouse today." : `Code sent to ${formData.phone}`}
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export default function OTPRegister({ onLogin }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Phone Number (Required for SMS verification)</label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="+1234567890" />
+                <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="+1234567890" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
@@ -184,35 +184,10 @@ export default function OTPRegister({ onLogin }) {
                 <input required type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="••••••••" />
               </div>
 
-              {/* Method Selector at the bottom of the form */}
-              <div className="pt-2">
-                <label className="block text-sm font-medium text-slate-300 mb-2">How would you like to receive your verification code?</label>
-                <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50">
-                  <button
-                    type="button"
-                    onClick={() => setMethod("email")}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      method === "email" ? "bg-brand-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
-                    }`}
-                  >
-                    Send to Email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMethod("phone")}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      method === "phone" ? "bg-[#00A19B] text-white shadow" : "text-slate-400 hover:text-slate-200"
-                    }`}
-                  >
-                    Send to Phone
-                  </button>
-                </div>
-              </div>
-
               {error && <div className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg p-3 text-center">{error}</div>}
 
               <button type="submit" disabled={loading} className="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-lg transition-all mt-4">
-                {loading ? "Processing..." : `Send OTP to ${method === 'email' ? 'Email' : 'Phone'}`}
+                {loading ? "Processing..." : "Send Verification OTP"}
               </button>
             </form>
 

@@ -4,7 +4,7 @@ import axios from "axios"
 import { GoogleLogin } from "@react-oauth/google"
 
 export default function OTPLogin({ onLogin }) {
-  const [method, setMethod] = useState("email") // "email" or "phone"
+  const [method, setMethod] = useState("phone") // "email" or "phone"
   const [identifier, setIdentifier] = useState("")
   const [step, setStep] = useState(1) // 1: Enter ID, 2: Enter OTP
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
@@ -185,36 +185,16 @@ export default function OTPLogin({ onLogin }) {
           
           {step === 1 && (
             <div className="space-y-6">
-              {/* Method Selector */}
-              <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50">
-                <button
-                  onClick={() => { setMethod("email"); setIdentifier(""); setError(""); }}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    method === "email" ? "bg-brand-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  Email
-                </button>
-                <button
-                  onClick={() => { setMethod("phone"); setIdentifier(""); setError(""); }}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    method === "phone" ? "bg-[#00A19B] text-white shadow" : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  Phone SMS
-                </button>
-              </div>
-
               <form onSubmit={handleSendOTP} className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-1.5">
-                    {method === "email" ? "Email Address" : "Phone Number (with country code)"}
+                    Phone Number (with country code)
                   </label>
                   <input
-                    type={method === "email" ? "email" : "tel"}
+                    type="tel"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder={method === "email" ? "you@example.com" : "+1234567890"}
+                    placeholder="+1234567890"
                     className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors placeholder-slate-500"
                   />
                 </div>
@@ -291,7 +271,7 @@ export default function OTPLogin({ onLogin }) {
               </div>
               <div className="text-center mt-2">
                 <button type="button" onClick={() => { setStep(1); setError(""); }} className="text-slate-500 hover:text-slate-300 text-xs transition-colors">
-                  Change {method === 'email' ? 'email' : 'phone number'}
+                  Change phone number
                 </button>
               </div>
             </form>
