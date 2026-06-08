@@ -47,7 +47,7 @@ export default function PaymentPage(){
     const handlePayment = async () => {
         setProcessing(true)
 
-        // Simulate a 2-second processing delay
+        
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         try {
@@ -61,7 +61,7 @@ export default function PaymentPage(){
             setProcessing(false)
             setSuccess(true)
 
-            // Redirect after showing success
+            
             setTimeout(() => {
                 navigate("/dashboard")
             }, 2500)

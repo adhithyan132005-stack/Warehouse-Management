@@ -16,7 +16,7 @@ export default function Activity(){
                     'Authorization': `Bearer ${token}`
                 }
             })
-            // Filter to show only order-related activities
+            
             const orderActivities = response.data.filter(act => act.type === "order")
             setActivities(orderActivities)
         } catch(err){
