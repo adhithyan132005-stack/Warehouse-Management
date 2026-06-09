@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom"
-import OTPRegister from "./auth/OTPRegister"
-import OTPLogin from "./auth/OTPLogin"
+import AuthGateway from "./auth/AuthGateway"
+import PhoneSignup from "./auth/PhoneSignup"
+import PhoneLogin from "./auth/PhoneLogin"
 import Home from "./pages/Home"
 import Dashboard from "./pages/Dashboard"
 import Layout from "./layout/layout"
@@ -36,7 +37,7 @@ export default function App() {
     localStorage.removeItem('role')
     setIsLoggedIn(false)
     setUserRole("")
-    navigate("/login")
+    navigate("/auth")
   }
 
   const isAdmin = userRole === "admin"
@@ -50,8 +51,12 @@ export default function App() {
     <div className="app-root">
       <Routes>
         <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
-        <Route path="/register" element={<OTPRegister onLogin={handleLogin} />} />
-        <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
+        <Route path="/auth" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <AuthGateway onLogin={handleLogin} />} />
+        <Route path="/phone-signup" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <PhoneSignup onLogin={handleLogin} />} />
+        <Route path="/phone-login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <PhoneLogin onLogin={handleLogin} />} />
+        {/* Legacy routes for backward compatibility */}
+        <Route path="/register" element={<Navigate to="/phone-signup" replace />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
         <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />

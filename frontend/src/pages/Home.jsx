@@ -19,10 +19,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/login')} className="text-slate-300 hover:text-white font-medium transition-colors px-4 py-2">
+            <button onClick={() => navigate('/auth')} className="text-slate-300 hover:text-white font-medium transition-colors px-4 py-2">
               Sign In
             </button>
-            <button onClick={() => navigate('/register')} className="bg-[#00A19B] hover:bg-[#008f8a] text-white font-medium py-2 px-6 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg shadow-[#00A19B]/25 hidden sm:block">
+            <button onClick={() => navigate('/phone-signup')} className="bg-[#00A19B] hover:bg-[#008f8a] text-white font-medium py-2 px-6 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg shadow-[#00A19B]/25 hidden sm:block">
               Get Started
             </button>
           </div>
@@ -43,10 +43,10 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-            <button onClick={() => navigate('/register')} className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-medium py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-xl shadow-brand-500/25 text-lg">
+            <button onClick={() => navigate('/phone-signup')} className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-medium py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-xl shadow-brand-500/25 text-lg">
               Start Free Trial
             </button>
-            <button onClick={() => navigate('/login')} className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-medium py-4 px-8 rounded-xl transition-all duration-200 border border-slate-700 text-lg">
+            <button onClick={() => navigate('/auth')} className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-medium py-4 px-8 rounded-xl transition-all duration-200 border border-slate-700 text-lg">
               Login to Dashboard
             </button>
           </div>

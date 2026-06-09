@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
+const bcryptjs = require('bcryptjs');
 const OTP = require('../Model/otp-model');
 const User = require('../Model/user-model');
 const { SendEmailOTPSchema, SendPhoneOTPSchema, VerifyOTPSchema, OTPLoginSchema } = require('../Validation/otp-validators');
@@ -144,7 +145,73 @@ OTPController.verifyOTP = async (req, res) => {
     }
 };
 
-// 4. OTP Login (Called immediately after successful verifyOTP if it's a login flow)
+// 4. OTP Login/Signup - For phone-based authentication
+OTPController.phoneAuthLogin = async (req, res) => {
+    try {
+        const { error, value } = OTPLoginSchema.validate(req.body);
+        if (error) return res.status(400).json({ error: error.details.map(e => e.message) });
+
+        const { identifier, type } = value;
+
+        // Only allow phone type for this endpoint
+        if (type !== 'phone') {
+            return res.status(400).json({ error: "This endpoint only supports phone authentication." });
+        }
+
+        // Ensure there's a *verified* OTP record for this identifier
+        const otpRecord = await OTP.findOne({ identifier, type, verified: true });
+        
+        if (!otpRecord) {
+            return res.status(401).json({ error: "Please verify OTP first before attempting to login." });
+        }
+
+        // Find existing user by phone
+        let user = await User.findOne({ phone: identifier });
+        
+        if (!user) {
+            // Auto-create user for phone OTP auth (signup)
+            const username = `User_${identifier.slice(-4)}`;
+            user = new User({
+                username: username,
+                phone: identifier,
+                email: null,
+                password: crypto.randomBytes(16).toString('hex'), // Random password for OTP users
+                role: 'user'
+            });
+
+            // Check if this is the first user (should be admin)
+            const userCount = await User.countDocuments();
+            if (userCount === 0) {
+                user.role = 'admin';
+            }
+
+            // Hash the password
+            const salt = await bcryptjs.genSalt();
+            user.password = await bcryptjs.hash(user.password, salt);
+            await user.save();
+        }
+
+        // Clean up verified OTP
+        await OTP.deleteOne({ _id: otpRecord._id });
+
+        // Generate JWT
+        if (!process.env.JWT_SECRET) {
+            console.error('CRITICAL ERROR: JWT_SECRET environment variable is not defined!');
+            return res.status(500).json({ error: 'Server configuration error (JWT_SECRET missing)' });
+        }
+
+        const TokenData = { userId: user._id, role: user.role };
+        const token = jwt.sign(TokenData, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+        res.json({ token: token, username: user.username, role: user.role, isNewUser: false });
+
+    } catch (err) {
+        console.error("Error in Phone Auth Login:", err);
+        res.status(500).json({ error: "Authentication failed", details: err.message });
+    }
+};
+
+// Legacy OTP Login
 OTPController.otpLogin = async (req, res) => {
     try {
         const { error, value } = OTPLoginSchema.validate(req.body);
@@ -168,8 +235,6 @@ OTPController.otpLogin = async (req, res) => {
         }
 
         if (!user) {
-            // Optional: Auto-create user if they don't exist (like a magic link)
-            // Or force them to register first. We'll return an error indicating they need to register.
             return res.status(404).json({ error: "User not found. Please register first." });
         }
 

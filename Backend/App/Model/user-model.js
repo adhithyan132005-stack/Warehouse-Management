@@ -2,7 +2,11 @@ const mongoose=require('mongoose');
 const{Schema,model}=mongoose
 const userSchema=new Schema({
     username:String,
-    email:String,
+    email:{
+        type:String,
+        sparse:true,
+        default:null
+    },
     password:String,
     phone: {
         type: String,
