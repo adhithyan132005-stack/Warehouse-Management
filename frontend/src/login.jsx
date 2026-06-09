@@ -1,4 +1,4 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 
@@ -139,6 +139,16 @@ export default function Login({ onLogin }) {
               className="font-medium text-brand-400 hover:text-brand-300 transition-colors bg-transparent border-none cursor-pointer"
             >
               Sign up
+            </button>
+
+          <div className="mt-6 pt-6 border-t border-slate-700/50 text-center text-sm text-slate-400">
+            Login with OTP instead?{' '}
+            <button 
+              type="button" 
+              onClick={() => navigate('/login-otp')} 
+              className="font-medium text-brand-400 hover:text-brand-300 transition-colors bg-transparent border-none cursor-pointer"
+            >
+              Use Email or Phone OTP
             </button>
           </div>
         </div>

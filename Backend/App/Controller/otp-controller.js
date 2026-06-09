@@ -13,6 +13,24 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// Helper to format phone numbers to E.164 format
+const formatPhoneNumber = (phone) => {
+    // If already in +format, return as is
+    if (phone.startsWith('+')) return phone;
+    
+    // If Indian number without country code, add +91
+    if (phone.length === 10 && /^\d{10}$/.test(phone)) {
+        return `+91${phone}`;
+    }
+    
+    // If already with +91 at the beginning, ensure proper format
+    if (phone.startsWith('91') && phone.length === 12) {
+        return `+${phone}`;
+    }
+    
+    return phone; // Return as is if already formatted
+};
+
 // --- NODEMAILER CONFIG ---
 const transporter = nodemailer.createTransport({
     service: 'gmail', // You can change this based on your provider
@@ -27,6 +45,9 @@ let twilioClient;
 try {
     if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
         twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+        console.log("✓ Twilio client initialized successfully");
+    } else {
+        console.warn("⚠ Twilio credentials not found in environment variables");
     }
 } catch (error) {
     console.error("Twilio Initialization Error:", error.message);
@@ -84,7 +105,10 @@ OTPController.sendPhoneOTP = async (req, res) => {
         const { error, value } = SendPhoneOTPSchema.validate(req.body);
         if (error) return res.status(400).json({ error: error.details.map(e => e.message) });
 
-        const phone = value.phone;
+        let phone = value.phone;
+        // Format phone to E.164 format
+        phone = formatPhoneNumber(phone);
+        
         const otpCode = generateOTP();
 
         await OTP.deleteMany({ identifier: phone, type: 'phone' });
@@ -98,13 +122,20 @@ OTPController.sendPhoneOTP = async (req, res) => {
         await newOTP.save();
 
         if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+            const fromNumber = process.env.TWILIO_PHONE_NUMBER.startsWith('+') 
+                ? process.env.TWILIO_PHONE_NUMBER 
+                : `+${process.env.TWILIO_PHONE_NUMBER}`;
+                
             await twilioClient.messages.create({
                 body: `Your Adhi Warehouse verification code is: ${otpCode}. Valid for 5 minutes.`,
-                from: process.env.TWILIO_PHONE_NUMBER,
+                from: fromNumber,
                 to: phone
             });
+            console.log(`✓ SMS sent to ${phone}`);
         } else {
             console.log(`[MOCK MODE] Phone OTP for ${phone}: ${otpCode}`);
+            if (!twilioClient) console.warn("⚠ Twilio client not initialized");
+            if (!process.env.TWILIO_PHONE_NUMBER) console.warn("⚠ TWILIO_PHONE_NUMBER not set");
         }
 
         res.json({ message: "OTP sent successfully to phone number.", type: 'phone' });
@@ -120,7 +151,12 @@ OTPController.verifyOTP = async (req, res) => {
         const { error, value } = VerifyOTPSchema.validate(req.body);
         if (error) return res.status(400).json({ error: error.details.map(e => e.message) });
 
-        const { identifier, otp, type } = value;
+        let { identifier, otp, type } = value;
+        
+        // Format phone numbers for lookup if type is phone
+        if (type === 'phone') {
+            identifier = formatPhoneNumber(identifier);
+        }
 
         const otpRecord = await OTP.findOne({ identifier, type, otp });
 
@@ -150,7 +186,12 @@ OTPController.otpLogin = async (req, res) => {
         const { error, value } = OTPLoginSchema.validate(req.body);
         if (error) return res.status(400).json({ error: error.details.map(e => e.message) });
 
-        const { identifier, type } = value;
+        let { identifier, type } = value;
+        
+        // Format phone numbers for lookup if type is phone
+        if (type === 'phone') {
+            identifier = formatPhoneNumber(identifier);
+        }
 
         // Ensure there's a *verified* OTP record for this identifier
         const otpRecord = await OTP.findOne({ identifier, type, verified: true });

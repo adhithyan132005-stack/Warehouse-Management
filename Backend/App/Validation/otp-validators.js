@@ -5,7 +5,9 @@ const SendEmailOTPSchema = joi.object({
 });
 
 const SendPhoneOTPSchema = joi.object({
-    phone: joi.string().trim().required() // Basic validation, can add regex for phone numbers
+    phone: joi.string().trim().pattern(/^\+?[1-9]\d{1,14}$/).required().messages({
+        'string.pattern.base': 'Phone number must be in E.164 format (e.g., +919876543210) or valid international format'
+    })
 });
 
 const VerifyOTPSchema = joi.object({

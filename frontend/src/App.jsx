@@ -52,6 +52,7 @@ export default function App() {
         <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
         <Route path="/register" element={<OTPRegister onLogin={handleLogin} />} />
         <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
+        <Route path="/login-otp" element={<OTPLogin onLogin={handleLogin} />} />
         <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />

@@ -3,6 +3,24 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { GoogleLogin } from "@react-oauth/google"
 
+// Helper to format phone numbers to E.164 format
+const formatPhoneNumber = (phone) => {
+  // If already in +format, return as is
+  if (phone.startsWith('+')) return phone
+  
+  // If Indian number without country code, add +91
+  if (phone.length === 10 && /^\d{10}$/.test(phone)) {
+    return `+91${phone}`
+  }
+  
+  // If already with +91 at the beginning, ensure proper format
+  if (phone.startsWith('91') && phone.length === 12) {
+    return `+${phone}`
+  }
+  
+  return phone // Return as is if already formatted
+}
+
 export default function OTPLogin({ onLogin }) {
   const [method, setMethod] = useState("phone") // "email" or "phone"
   const [identifier, setIdentifier] = useState("")
@@ -59,18 +77,26 @@ export default function OTPLogin({ onLogin }) {
     setLoading(true)
 
     try {
-      const endpoint = method === 'email' ? '/api/otp/send-email' : '/api/otp/send-phone'
-      const payload = method === 'email' ? { email: identifier } : { phone: identifier }
+      let payload
+      let endpoint = method === 'email' ? '/api/otp/send-email' : '/api/otp/send-phone'
+      
+      if (method === 'email') {
+        payload = { email: identifier }
+      } else {
+        // Format phone number for API
+        const formattedPhone = formatPhoneNumber(identifier)
+        payload = { phone: formattedPhone }
+      }
       
       await axios.post(`https://warehouse-management-backend-t3q2.onrender.com${endpoint}`, payload)
       
       setStep(2)
-      setCountdown(60)
+      setCountdown(300) // 5 minutes
       setOtp(["", "", "", "", "", ""])
       // Focus first input automatically on next tick
       setTimeout(() => inputRefs.current[0]?.focus(), 100)
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to send OTP. Please try again.")
+      setError(err.response?.data?.error || err.response?.data?.details || "Failed to send OTP. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -88,16 +114,21 @@ export default function OTPLogin({ onLogin }) {
     setLoading(true)
 
     try {
+      let formattedIdentifier = identifier
+      if (method === 'phone') {
+        formattedIdentifier = formatPhoneNumber(identifier)
+      }
+
       // Step 1: Verify OTP
       await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/otp/verify", {
-        identifier,
+        identifier: formattedIdentifier,
         otp: otpString,
         type: method
       })
 
       // Step 2: Login
       const loginResponse = await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/otp/login", {
-        identifier,
+        identifier: formattedIdentifier,
         type: method
       })
 
@@ -111,7 +142,7 @@ export default function OTPLogin({ onLogin }) {
         navigate('/dashboard')
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Invalid OTP or login failed.")
+      setError(err.response?.data?.error || err.response?.data?.details || "Invalid OTP or login failed.")
     } finally {
       setLoading(false)
     }
@@ -185,18 +216,79 @@ export default function OTPLogin({ onLogin }) {
           
           {step === 1 && (
             <div className="space-y-6">
+              {/* Method Toggle */}
+              <div className="flex gap-2 mb-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMethod("email")
+                    setIdentifier("")
+                    setError("")
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    method === "email"
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-800/50 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  📧 Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMethod("phone")
+                    setIdentifier("")
+                    setError("")
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    method === "phone"
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-800/50 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  📱 Phone
+                </button>
+              </div>
+
               <form onSubmit={handleSendOTP} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
-                    Phone Number (with country code)
-                  </label>
-                  <input
-                    type="tel"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="+1234567890"
-                    className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors placeholder-slate-500"
-                  />
+                  {method === "email" ? (
+                    <>
+                      <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors placeholder-slate-500"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                        Phone Number (Indian)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value="+91"
+                          disabled
+                          className="w-16 bg-slate-700/50 border border-slate-600 text-white rounded-lg px-3 py-3 text-sm font-medium"
+                        />
+                        <input
+                          type="tel"
+                          value={identifier}
+                          onChange={(e) => setIdentifier(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                          placeholder="9876543210"
+                          maxLength="10"
+                          className="flex-1 bg-slate-800/50 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors placeholder-slate-500"
+                        />
+                      </div>
+                      <p className="text-xs text-slate-400 mt-2">10-digit phone number</p>
+                    </>
+                  )}
                 </div>
 
                 {error && <div className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg p-3 text-center">{error}</div>}
@@ -204,7 +296,7 @@ export default function OTPLogin({ onLogin }) {
                 <button 
                   type="submit" 
                   disabled={loading || !identifier} 
-                  className="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-brand-500/25 flex justify-center items-center"
+                  className="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-brand-500/25 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Sending..." : "Send Verification Code"}
                 </button>
@@ -254,7 +346,7 @@ export default function OTPLogin({ onLogin }) {
               <button 
                 type="submit" 
                 disabled={loading || otp.join("").length !== 6} 
-                className="w-full bg-[#00A19B] hover:bg-[#008f8a] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-[#00A19B]/25 flex justify-center items-center"
+                className="w-full bg-[#00A19B] hover:bg-[#008f8a] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-[#00A19B]/25 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Verifying..." : "Verify & Sign In"}
               </button>
@@ -262,7 +354,7 @@ export default function OTPLogin({ onLogin }) {
               <div className="text-center mt-4 text-sm text-slate-400">
                 Didn't receive the code?{" "}
                 {countdown > 0 ? (
-                  <span className="text-slate-500">Resend in {countdown}s</span>
+                  <span className="text-slate-500">Resend in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}</span>
                 ) : (
                   <button type="button" onClick={() => handleSendOTP()} className="text-brand-400 hover:text-brand-300 font-medium">
                     Resend OTP
@@ -271,7 +363,7 @@ export default function OTPLogin({ onLogin }) {
               </div>
               <div className="text-center mt-2">
                 <button type="button" onClick={() => { setStep(1); setError(""); }} className="text-slate-500 hover:text-slate-300 text-xs transition-colors">
-                  Change phone number
+                  Change {method}
                 </button>
               </div>
             </form>
