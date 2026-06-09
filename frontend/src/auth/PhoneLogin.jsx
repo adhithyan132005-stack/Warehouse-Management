@@ -12,7 +12,7 @@ export default function PhoneLogin({ onLogin }) {
   const [countdown, setCountdown] = useState(0)
   const inputRefs = useRef([])
 
-  // Format phone number for display
+  
   const formatPhoneDisplay = (phoneNum) => {
     if (!phoneNum) return ""
     const cleaned = phoneNum.replace(/\D/g, '')
