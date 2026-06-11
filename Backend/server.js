@@ -62,12 +62,6 @@ app.use("/api", orderRoutes)
 app.use("/api", activityRoutes)
 app.use("/api", notificationRoutes)
 
-// OTP Routes
-const OTPController = require("./App/Controller/otp-controller");
-app.post("/api/otp/send-email", OTPController.sendEmailOTP);
-app.post("/api/otp/send-phone", OTPController.sendPhoneOTP);
-app.post("/api/otp/verify", OTPController.verifyOTP);
-app.post("/api/otp/login", OTPController.otpLogin);
 
 // Google OAuth Routes
 const GoogleAuthController = require("./App/Controller/google-auth-controller");
