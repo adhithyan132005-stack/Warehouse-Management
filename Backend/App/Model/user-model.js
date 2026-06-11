@@ -4,11 +4,6 @@ const userSchema=new Schema({
     username:String,
     email:String,
     password:String,
-    phone: {
-        type: String,
-        trim: true,
-        default: null
-    },
     role:{
         type:String,
         default:'user',
