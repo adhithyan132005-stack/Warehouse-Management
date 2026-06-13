@@ -12,6 +12,7 @@ export default function CreateOrder() {
     const [currentPage, setCurrentPage] = useState(1)
     const [searchQuery, setSearchQuery] = useState("")
     const [loading, setLoading] = useState(false)
+    const [isCheckingOut, setIsCheckingOut] = useState(false)
     const navigate = useNavigate()
 
     // Save cart state to local storage when it changes
@@ -123,11 +124,13 @@ export default function CreateOrder() {
     }, [cart])
 
     const handleCheckout = async () => {
+        if (isCheckingOut) return
         if (cart.length === 0) {
             alert('Your cart is empty.')
             return
         }
 
+        setIsCheckingOut(true)
         const customerName = localStorage.getItem('userName') || "Customer"
 
         try {
@@ -154,6 +157,8 @@ export default function CreateOrder() {
         } catch (err) {
             console.error("Error creating order:", err)
             alert("Error creating order: " + (err.response?.data?.error || err.message))
+        } finally {
+            setIsCheckingOut(false)
         }
     }
 
@@ -434,6 +439,7 @@ export default function CreateOrder() {
                             <button
                                 type="button"
                                 onClick={handleCheckout}
+                                disabled={isCheckingOut}
                                 style={{
                                     width: '100%',
                                     padding: '14px 20px',
@@ -443,16 +449,17 @@ export default function CreateOrder() {
                                     borderRadius: '16px',
                                     fontWeight: 'bold',
                                     fontSize: '0.9rem',
-                                    cursor: 'pointer',
+                                    cursor: isCheckingOut ? 'not-allowed' : 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: '8px',
                                     boxShadow: '0 8px 20px rgba(0, 161, 155, 0.25)',
-                                    transition: 'transform 0.2s'
+                                    transition: 'transform 0.2s',
+                                    opacity: isCheckingOut ? 0.7 : 1
                                 }}
                             >
-                                💳 Place Order & Pay (₹{cartTotal.toLocaleString()})
+                                {isCheckingOut ? "Processing Checkout..." : `💳 Place Order & Pay (₹${cartTotal.toLocaleString()})`}
                             </button>
                             
                             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center', margin: '12px 0 0' }}>
