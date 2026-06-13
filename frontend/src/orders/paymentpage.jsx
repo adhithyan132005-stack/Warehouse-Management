@@ -17,11 +17,17 @@ export default function PaymentPage(){
     const [cardName, setCardName] = useState("")
     const [upiId, setUpiId] = useState("")
 
+    // Dynamic Backend URL detection
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const BASE_URL = isLocal 
+        ? "http://localhost:4444" 
+        : "https://warehouse-management-backend-t3q2.onrender.com";
+
     useEffect(() => {
         const fetchOrder = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/user-orders`, {
+                const response = await axios.get(`${BASE_URL}/api/user-orders`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 const foundOrder = response.data.find(o => o._id === id)
@@ -52,7 +58,7 @@ export default function PaymentPage(){
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/orders/${id}`, {
+            await axios.put(`${BASE_URL}/api/orders/${id}`, {
                 status: "paid"
             }, {
                 headers: { Authorization: `Bearer ${token}` }

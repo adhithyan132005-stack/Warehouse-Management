@@ -120,7 +120,10 @@ export default function ProductTable({ refreshTrigger }) {
                                                     src={getImageUrl(p.image)} 
                                                     alt={p.name} 
                                                     className="h-full w-full object-cover"
-                                                    onError={(e) => { e.target.src = "https://via.placeholder.com/300?text=Error"; }}
+                                                    onError={(e) => { 
+                                                        e.target.onerror = null; 
+                                                        e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%2364748b'>No Image</text></svg>"; 
+                                                    }}
                                                 />
                                             </div>
                                             <div className="flex flex-col">
@@ -187,6 +190,10 @@ export default function ProductTable({ refreshTrigger }) {
                                     src={getImageUrl(p.image)} 
                                     alt={p.name} 
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    onError={(e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%2364748b'>No Image</text></svg>"; 
+                                    }}
                                 />
                                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-xl border border-white/50">
                                     <span className="text-lg font-black text-slate-900">₹{p.price}</span>
@@ -234,7 +241,10 @@ export default function ProductTable({ refreshTrigger }) {
                             alt="Full preview" 
                             className="max-w-full max-h-full object-contain rounded-3xl shadow-2xl border border-white/20"
                             onClick={(e) => e.stopPropagation()}
-                            onError={(e) => { e.target.src = "https://via.placeholder.com/800?text=Image+Load+Error"; }}
+                            onError={(e) => { 
+                                e.target.onerror = null; 
+                                e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'><rect width='100%' height='100%' fill='%230f172a'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='20' fill='%2394a3b8'>Image Load Error</text></svg>"; 
+                            }}
                         />
                     </div>
                 </div>

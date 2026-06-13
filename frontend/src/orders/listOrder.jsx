@@ -310,7 +310,10 @@ export default function ListOrder(){
                                             src={getImageUrl(item.productId?.image)} 
                                             alt={item.productId?.name} 
                                             className="w-8 h-8 rounded object-cover border border-slate-200"
-                                            onError={(e) => { e.target.src = "https://via.placeholder.com/50?text=Err"; }}
+                                            onError={(e) => { 
+                                                e.target.onerror = null; 
+                                                e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%2364748b'>N/A</text></svg>"; 
+                                            }}
                                         />
                                         <span className="text-xs">{item.productId?.name} (x{item.quantity})</span>
                                     </div>

@@ -7,7 +7,6 @@ export default function Sidebar({ role, onClose }) {
   const canViewProducts = isAdmin || isStaff
   const canManageInventory = isAdmin || isStaff
   const canViewOrders = isAdmin || isStaff
-  const canViewSuppliers = isAdmin || isStaff
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -109,13 +108,6 @@ export default function Sidebar({ role, onClose }) {
                   Tracking
                 </NavLink>
               </>
-            )}
-
-            {canViewSuppliers && (
-              <NavLink to="/suppliers" className={linkClass}>
-                <span className="text-lg">🏢</span>
-                Suppliers
-              </NavLink>
             )}
           </>
         )}

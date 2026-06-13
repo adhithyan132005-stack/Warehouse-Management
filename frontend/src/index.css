@@ -661,6 +661,13 @@ button {
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
 }
 
+.inventory-form-container .auth-title {
+  background: none;
+  -webkit-text-fill-color: initial;
+  color: #0f172a;
+}
+
+
 .form-header {
   display: flex;
   align-items: center;
