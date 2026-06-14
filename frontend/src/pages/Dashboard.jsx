@@ -302,6 +302,12 @@ export default function Dashboard() {
                           >
                             Track Order Status
                           </button>
+                          <button 
+                            className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5"
+                            onClick={() => navigate('/queries', { state: { orderId: order._id, orderNumber: order.orderNumber } })}
+                          >
+                            💬 Ask Query
+                          </button>
                       </div>
 
                       {selectedOrder === order._id && (

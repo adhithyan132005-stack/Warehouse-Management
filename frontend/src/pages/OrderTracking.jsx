@@ -1,11 +1,13 @@
 import axios from "axios"
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function OrderTracking() {
     const [orderNumber, setOrderNumber] = useState("")
     const [activities, setActivities] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+    const navigate = useNavigate()
 
     // Check for auto-filled order number from localStorage
     useEffect(() => {
@@ -208,7 +210,28 @@ export default function OrderTracking() {
 
             {!loading && activities.length > 0 && (
                 <div>
-                    <h3>📋 Complete Order Timeline</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+                        <h3 style={{ margin: 0 }}>📋 Complete Order Timeline</h3>
+                        <button
+                            onClick={() => {
+                                const firstActivity = activities[0];
+                                const orderId = firstActivity?.orderId || "";
+                                navigate('/queries', { state: { orderId: orderId, orderNumber: orderNumber } });
+                            }}
+                            style={{
+                                padding: "8px 16px",
+                                fontSize: "14px",
+                                backgroundColor: "#00A19B",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            💬 Ask Support
+                        </button>
+                    </div>
                     
                     {/* Current Status Summary */}
                     <div style={{ 

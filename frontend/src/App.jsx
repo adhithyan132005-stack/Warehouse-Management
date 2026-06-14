@@ -18,6 +18,7 @@ import WarehouseVisualizer from "./pages/WarehouseVisualizer"
 import PaymentPage from "./orders/paymentpage"
 import Settings from "./pages/Settings"
 import Search from "./pages/Search"
+import Queries from "./pages/Queries"
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/location" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><AddLocation /></Layout></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><Users /></Layout></ProtectedRoute>} />
         <Route path="/payment/:id" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><PaymentPage /></Layout></ProtectedRoute>} />
+        <Route path="/queries" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Queries /></Layout></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Settings /></Layout></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Search /></Layout></ProtectedRoute>} />
       </Routes>

@@ -14,6 +14,7 @@ const locationRoutes = require("./App/Routes/locationRoutes")
 const orderRoutes = require("./App/Routes/orderRoutes")
 const activityRoutes = require("./App/Routes/ActivityRoutes")
 const notificationRoutes = require("./App/Routes/notificationRoutes")
+const queryRoutes = require("./App/Routes/queryRoutes")
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -61,6 +62,7 @@ app.use("/api", locationRoutes)
 app.use("/api", orderRoutes)
 app.use("/api", activityRoutes)
 app.use("/api", notificationRoutes)
+app.use("/api", queryRoutes)
 
 
 // Google OAuth Routes

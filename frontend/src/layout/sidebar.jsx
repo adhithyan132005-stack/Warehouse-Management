@@ -65,6 +65,10 @@ export default function Sidebar({ role, onClose }) {
               <span className="text-lg">🚚</span>
               Track Order
             </NavLink>
+            <NavLink to="/queries" className={linkClass}>
+              <span className="text-lg">💬</span>
+              Support Queries
+            </NavLink>
             <NavLink to="/settings" className={linkClass}>
               <span className="text-lg">⚙️</span>
               Settings
@@ -106,6 +110,10 @@ export default function Sidebar({ role, onClose }) {
                 <NavLink to="/track-order" className={linkClass}>
                   <span className="text-lg">🚚</span>
                   Tracking
+                </NavLink>
+                <NavLink to="/queries" className={linkClass}>
+                  <span className="text-lg">💬</span>
+                  Customer Queries
                 </NavLink>
               </>
             )}
