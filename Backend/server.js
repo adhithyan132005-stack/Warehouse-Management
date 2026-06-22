@@ -34,6 +34,16 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+// Debug Endpoint to view users
+app.get("/api/debug-users", async (req, res) => {
+    try {
+        const users = await mongoose.connection.db.collection('users').find().toArray();
+        res.json(users.map(u => ({ id: u._id, username: u.username, email: u.email, role: u.role })));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
     const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
