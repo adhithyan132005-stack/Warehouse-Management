@@ -14,7 +14,7 @@ productController.create=async(req,res)=>{
             category: req.body.category,
             price: req.body.price,
             description: req.body.description,
-            image: req.file ? req.file.filename : null
+            image: req.file ? req.file.path : null
         })
 
         await product.save()
@@ -55,7 +55,7 @@ productController.update=async(req,res)=>{
     
     
     if (req.file) {
-        body.image = req.file.filename
+        body.image = req.file.path
     }
 
     try{
