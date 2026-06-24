@@ -12,7 +12,10 @@
     "mongoose": "^9.2.4",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "razorpay": "^2.9.6",
-    "react-qr-barcode-scanner": "^2.1.25"
+    "razorpay": "^2.9.6"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   }
 }

@@ -1,195 +1,277 @@
-import { useState } from "react"
-import axios from "axios"
-import Barcode from "./barcode"
+import { useState } from 'react'
+import axios from 'axios'
+import Barcode from './barcode'
 
-export default function AddProduct({close,refresh}){
-    // Dynamic Backend URL detection
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const BASE_URL = isLocal 
-        ? "http://localhost:4444" 
-        : "https://warehouse-management-backend-t3q2.onrender.com";
+const BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:4444'
+    : 'https://warehouse-management-backend-t3q2.onrender.com'
 
-    const[form,setForm]=useState({
-        name:"",
-        sku:"",
-        barcode:"",
-        category:"",
-        price:"",
-        description:"",
-        image:null
-    })
-    const[error,seterror]=useState("")
-    const [showScanner, setShowScanner] = useState(false);
-    const [preview, setPreview] = useState(null)
-    const handleImageChange=(e)=>{
-      const file=e.target.files[0]
-      if (file) {
-          setForm({...form,image:file})
-          setPreview(URL.createObjectURL(file))
-      }
-    }
-    const handleChange=async(e)=>{
-        setForm({...form,[e.target.name]:e.target.value})
-    }
-    const handleBarcodeScan = async (code) => {
-        setShowScanner(false);
-        setForm((prev) => ({ ...prev, barcode: code }));
-        try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get(`${BASE_URL}/api/barcode/${code}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            setForm({
-                name: res.data.name,
-                sku: res.data.sku,
-                barcode: res.data.barcode,
-                category: res.data.category,
-                price: res.data.price,
-                description: res.data.description
-            });
-        } catch (err) {
-            console.log("New product");
+export default function AddProduct({ close, refresh }) {
+
+    const [name,        setName]        = useState('')
+    const [sku,         setSku]         = useState('')
+    const [barcode,     setBarcode]     = useState('')
+    const [category,    setCategory]    = useState('')
+    const [price,       setPrice]       = useState('')
+    const [description, setDescription] = useState('')
+    const [imageFile,   setImageFile]   = useState(null)
+    const [preview,     setPreview]     = useState(null)
+    const [loading,     setLoading]     = useState(false)
+    const [error,       setError]       = useState('')
+    const [showScanner, setShowScanner] = useState(false)
+
+    // When user picks an image file
+    const handleImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            setImageFile(file)
+            setPreview(URL.createObjectURL(file))  // show preview
         }
-    };
+    }
 
-    const handlesubmit = async (e) => {
+    // When barcode is scanned, try to auto-fill product details
+    const handleBarcodeScan = async (code) => {
+        setShowScanner(false)
+        setBarcode(code)
+        try {
+            const token = localStorage.getItem('token')
+            const res = await axios.get(`${BASE_URL}/api/barcode/${code}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            // If product found by barcode, fill in the fields
+            setName(res.data.name || '')
+            setSku(res.data.sku || '')
+            setCategory(res.data.category || '')
+            setPrice(res.data.price || '')
+            setDescription(res.data.description || '')
+        } catch {
+            // Product not found — that's okay, user will fill in manually
+        }
+    }
+
+    // Submit the form
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!form.name || !form.sku || !form.category || !form.price) {
-            seterror("All required fields must be filled")
+
+        if (!name || !sku || !category || !price) {
+            setError('Please fill in Name, SKU, Category and Price')
             return
         }
 
+        setError('')
+        setLoading(true)
+
         try {
-            seterror("")
             const token = localStorage.getItem('token')
+
+            // Use FormData to send text + file together
             const formData = new FormData()
-            formData.append("name", form.name)
-            formData.append("sku", form.sku)
-            if (form.barcode) formData.append("barcode", form.barcode)
-            formData.append("category", form.category)
-            formData.append("price", form.price)
-            formData.append("description", form.description)
-            if (form.image) formData.append("image", form.image)
+            formData.append('name',        name)
+            formData.append('sku',         sku)
+            formData.append('category',    category)
+            formData.append('price',       price)
+            formData.append('description', description)
+            if (barcode)   formData.append('barcode', barcode)
+            if (imageFile) formData.append('image',   imageFile)   // multer picks this up → uploads to Cloudinary
 
             await axios.post(`${BASE_URL}/api/product`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
+                // No need to set Content-Type — axios sets it automatically for FormData
             })
 
-            alert("Product Added Successfully")
             if (refresh) refresh()
-            if (close) close()
+            if (close)   close()
+
         } catch (err) {
-            console.error(err)
-            const message = err.response?.data?.error || err.response?.data?.message || err.message || "Something went wrong"
-            seterror(message)
+            setError(err.response?.data?.error || 'Something went wrong. Please try again.')
+        } finally {
+            setLoading(false)
         }
     }
-    return(
-        <div className="add-product-container">
-            <div className="form-header">
-                <h2>Add product</h2>
-                <button className="close-btn"onClick={close}>✖</button>
 
+    return (
+        <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.15)'
+        }}>
+
+            {/* Header */}
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '20px 24px', borderBottom: '1px solid #f1f5f9'
+            }}>
+                <div>
+                    <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>Add New Product</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>Image is uploaded directly to Cloudinary</p>
+                </div>
+                <button onClick={close} style={{
+                    background: '#f8fafc', border: '1px solid #e2e8f0',
+                    borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '16px'
+                }}>✕</button>
             </div>
-            {error && <p className="error">{error}</p>}
-            <form onSubmit={handlesubmit} className="auth-form">
-                <div className="form-group">
-                    <label className="form-label">Product Image</label>
-                    <input type="file" accept="image/*" onChange={handleImageChange} className="form-input file-input" />
-                    {preview && (
-                        <img src={preview} alt="preview" className="preview-image" />
-                    )}
+
+            <form onSubmit={handleSubmit} style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto' }}>
+
+                {/* Error Message */}
+                {error && (
+                    <div style={{
+                        background: '#fef2f2', border: '1px solid #fecaca',
+                        color: '#dc2626', padding: '12px 16px', borderRadius: '10px',
+                        marginBottom: '16px', fontSize: '14px'
+                    }}>
+                        ⚠️ {error}
+                    </div>
+                )}
+
+                {/* Image Upload */}
+                <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>
+                        Product Image (optional)
+                    </label>
+
+                    <label style={{
+                        display: 'block', border: '2px dashed #e2e8f0',
+                        borderRadius: '12px', cursor: 'pointer', overflow: 'hidden',
+                        borderColor: preview ? '#00A19B' : '#e2e8f0'
+                    }}>
+                        {preview
+                            ? <img src={preview} alt="preview" style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                            : (
+                                <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8' }}>
+                                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>🖼️</div>
+                                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Click to upload image</div>
+                                    <div style={{ fontSize: '12px', marginTop: '4px' }}>JPG, PNG, WebP — max 5MB</div>
+                                </div>
+                            )
+                        }
+                        <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                    </label>
                 </div>
 
-                <div className="form-grid-two">
-                    <div className="form-group">
-                        <label className="form-label">Product Name</label>
-                        <input type="text"
-                            name="name"
-                            placeholder="Product name"
-                            value={form.name}
-                            onChange={handleChange}
-                            className="form-input"
+                {/* Name + SKU */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <div>
+                        <label style={labelStyle}>Product Name *</label>
+                        <input
+                            style={inputStyle}
+                            placeholder="e.g. Wireless Mouse"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
                         />
                     </div>
-
-                    <div className="form-group">
-                        <label className="form-label">SKU</label>
-                        <input type="text"
-                            name="sku"
-                            placeholder="SKU"
-                            value={form.sku}
-                            onChange={handleChange}
-                            className="form-input"
+                    <div>
+                        <label style={labelStyle}>SKU *</label>
+                        <input
+                            style={inputStyle}
+                            placeholder="e.g. WM-001"
+                            value={sku}
+                            onChange={e => setSku(e.target.value)}
                         />
                     </div>
                 </div>
 
-                <div className="form-group barcode-group">
-                    <label className="form-label">Barcode</label>
-                    <div className="barcode-row">
-                        <input type="text"
-                            name="barcode"
-                            placeholder="Barcode (optional)"
-                            value={form.barcode}
-                            onChange={handleChange}
-                            className="form-input"
+                {/* Barcode */}
+                <div style={{ marginBottom: '12px' }}>
+                    <label style={labelStyle}>Barcode</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                            style={{ ...inputStyle, flex: 1 }}
+                            placeholder="Optional"
+                            value={barcode}
+                            onChange={e => setBarcode(e.target.value)}
                         />
-                        <button type="button" className="btn btn--primary barcode-scan-btn" onClick={() => setShowScanner(true)}>
-                            📷 Scan Barcode
+                        <button
+                            type="button"
+                            onClick={() => setShowScanner(true)}
+                            style={{
+                                padding: '10px 16px', background: '#0f172a', color: 'white',
+                                border: 'none', borderRadius: '10px', cursor: 'pointer',
+                                fontSize: '13px', fontWeight: 700, whiteSpace: 'nowrap'
+                            }}
+                        >
+                            📷 Scan
                         </button>
                     </div>
                 </div>
 
-                {showScanner && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <Barcode
-                                onScan={handleBarcodeScan}
-                                close={() => setShowScanner(false)}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <div className="form-grid-two">
-                    <div className="form-group">
-                        <label className="form-label">Category</label>
-                        <input type="text"
-                            name="category"
-                            placeholder="Category"
-                            value={form.category}
-                            onChange={handleChange}
-                            className="form-input"
+                {/* Category + Price */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <div>
+                        <label style={labelStyle}>Category *</label>
+                        <input
+                            style={inputStyle}
+                            placeholder="e.g. Electronics"
+                            value={category}
+                            onChange={e => setCategory(e.target.value)}
                         />
                     </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Price</label>
-                        <input type="number"
-                            name="price"
-                            placeholder="Price"
-                            value={form.price}
-                            onChange={handleChange}
-                            className="form-input"
+                    <div>
+                        <label style={labelStyle}>Price (₹) *</label>
+                        <input
+                            style={inputStyle}
+                            type="number"
+                            placeholder="0"
+                            value={price}
+                            onChange={e => setPrice(e.target.value)}
                         />
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label">Description</label>
+                {/* Description */}
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={labelStyle}>Description</label>
                     <textarea
-                        name="description"
-                        placeholder="Description"
-                        value={form.description}
-                        onChange={handleChange}
-                        className="form-input"
-                        rows="4"
+                        style={{ ...inputStyle, resize: 'none' }}
+                        rows={3}
+                        placeholder="Optional description..."
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
                     />
                 </div>
 
-                <button type="submit" className="submit-btn btn btn--primary">Add product</button>
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                        width: '100%', padding: '14px',
+                        background: loading ? '#94a3b8' : '#00A19B',
+                        color: 'white', border: 'none', borderRadius: '12px',
+                        fontSize: '15px', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer',
+                        transition: 'background 0.2s'
+                    }}
+                >
+                    {loading ? '⏳ Uploading to Cloudinary...' : '✅ Add Product'}
+                </button>
             </form>
+
+            {/* Barcode Scanner Modal */}
+            {showScanner && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 999,
+                    background: 'rgba(0,0,0,0.7)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <div style={{ background: 'white', borderRadius: '16px', padding: '16px', width: '100%', maxWidth: '360px' }}>
+                        <Barcode onScan={handleBarcodeScan} close={() => setShowScanner(false)} />
+                    </div>
+                </div>
+            )}
         </div>
     )
+}
+
+// Shared styles
+const labelStyle = {
+    display: 'block', fontSize: '12px', fontWeight: 700,
+    color: '#64748b', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'
+}
+
+const inputStyle = {
+    width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0',
+    borderRadius: '10px', fontSize: '14px', color: '#0f172a',
+    outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+    transition: 'border-color 0.2s'
 }

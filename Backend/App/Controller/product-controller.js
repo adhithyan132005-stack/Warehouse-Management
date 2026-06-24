@@ -1,97 +1,104 @@
-const Product=require("../Model/product-model")
-const productController={}
-productController.create=async(req,res)=>{
-    const { name, sku, category, price } = req.body
+const Product = require('../Model/product-model')
+
+const productController = {}
+
+// ── CREATE a new product ──────────────────────────────────────────────────────
+productController.create = async (req, res) => {
+    const { name, sku, category, price, barcode, description } = req.body
+
+    // Check required fields
     if (!name || !sku || !category || !price) {
         return res.status(400).json({ error: 'name, sku, category and price are required' })
     }
 
-    try{
-          const product = new Product({
-            name: req.body.name,
-            sku: req.body.sku,
-            barcode: req.body.barcode,
-            category: req.body.category,
-            price: req.body.price,
-            description: req.body.description,
-            image: req.file ? req.file.path : null
+    try {
+        // If user uploaded an image, req.file.path = the Cloudinary URL
+        // If no image uploaded, image stays null
+        const imageUrl = req.file ? req.file.path : null
+
+        const product = new Product({
+            name,
+            sku,
+            category,
+            price,
+            barcode:     barcode || null,
+            description: description || null,
+            image:       imageUrl
         })
 
         await product.save()
-        res.status(201).json({message:"product created successfully",product})
 
-    }catch(err){
-        console.error('Product create error:', err)
-        if (err.name === 'ValidationError') {
-            return res.status(400).json({ error: err.message })
-        }
+        res.status(201).json({ message: 'Product created successfully', product })
+
+    } catch (err) {
+        // SKU already exists
         if (err.code === 11000) {
-            const field = Object.keys(err.keyValue)[0]
-            return res.status(409).json({ error: `${field} already exists` })
+            return res.status(409).json({ error: 'SKU already exists' })
         }
-        res.status(500).json({error:err.message})
+        res.status(500).json({ error: err.message })
     }
 }
-productController.list=async(req,res)=>{
-    try{
-        const product=await Product.find()
-        res.json(product)
-    }catch(err){
-        res.status(500).json({error:err.message})
-    }
-}
-productController.show=async(req,res)=>{
-    const id=req.params.id
-    try{
-        const product=await Product.findById(id)
-        res.json(product)
-    }catch(err){
-        res.status(500).json({error:err.message})
-    }
-}
-productController.update=async(req,res)=>{
-    const id=req.params.id
-    const body=req.body;
-    
-    
-    if (req.file) {
-        body.image = req.file.path
-    }
 
-    try{
-        const product=await Product.findByIdAndUpdate(id,body,{new:true})
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found' })
-        }
-        res.json(product)
-    }catch(err){
-        console.error('Product update error:', err)
-        res.status(500).json({error:err.message})
-    }
-}
-productController.delete=async(req,res)=>{
-    const id=req.params.id
-    try{
-        const product = await Product.findByIdAndDelete(id)
-        res.json({message:"product deleted",product})
-    }catch(err){
-        res.status(500).json({error:err.message})
-    }
-}
-productController.barcode=async(req,res)=>{
-    try{
-        const code = req.params.code || req.query.code
-        if (!code) {
-            return res.status(400).json({message:"barcode code is required"})
-        }
-
-        const products = await Product.findOne({barcode: code})
-        if(!products){
-            return res.status(404).json({message:"product not found"})
-        }
+// ── GET all products ──────────────────────────────────────────────────────────
+productController.list = async (req, res) => {
+    try {
+        const products = await Product.find().sort({ createdAt: -1 })
         res.json(products)
-    }catch(err){
-        res.status(500).json({error:err.message})
+    } catch (err) {
+        res.status(500).json({ error: err.message })
     }
 }
-module.exports=productController
+
+// ── GET one product by ID ─────────────────────────────────────────────────────
+productController.show = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id)
+        if (!product) return res.status(404).json({ error: 'Product not found' })
+        res.json(product)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+// ── UPDATE a product ──────────────────────────────────────────────────────────
+productController.update = async (req, res) => {
+    try {
+        const updateData = { ...req.body }
+
+        // If a new image was uploaded, update the image URL
+        if (req.file) {
+            updateData.image = req.file.path
+        }
+
+        const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true })
+        if (!product) return res.status(404).json({ error: 'Product not found' })
+
+        res.json(product)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+// ── DELETE a product ──────────────────────────────────────────────────────────
+productController.delete = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id)
+        if (!product) return res.status(404).json({ error: 'Product not found' })
+        res.json({ message: 'Product deleted successfully' })
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+// ── FIND product by barcode ───────────────────────────────────────────────────
+productController.barcode = async (req, res) => {
+    try {
+        const product = await Product.findOne({ barcode: req.params.code })
+        if (!product) return res.status(404).json({ message: 'Product not found' })
+        res.json(product)
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+}
+
+module.exports = productController

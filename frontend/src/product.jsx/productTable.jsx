@@ -1,259 +1,357 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
-export default function ProductTable({ refreshTrigger }) {
-    const [products, setProducts] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedImage, setSelectedImage] = useState(null);
-    const userRole = localStorage.getItem("role") || "user";
+const BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:4444'
+    : 'https://warehouse-management-backend-t3q2.onrender.com'
 
-    // Dynamic Backend URL detection (Fixes Point #2 in your guide)
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const BASE_URL = isLocal 
-        ? "http://localhost:4444" 
-        : "https://warehouse-management-backend-t3q2.onrender.com";
+// Show a placeholder box when image is missing or broken
+const NO_IMAGE = "data:image/svg+xml;utf8," + encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'>
+        <rect width='200' height='200' fill='%23f1f5f9'/>
+        <text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-size='40'>📦</text>
+        <text x='50%' y='68%' dominant-baseline='middle' text-anchor='middle' font-size='13' fill='%2394a3b8'>No Image</text>
+    </svg>
+`)
 
+export default function ProductTable({ refreshTrigger, onRefresh }) {
+
+    const [products,   setProducts]   = useState([])
+    const [search,     setSearch]     = useState('')
+    const [bigImage,   setBigImage]   = useState(null)   // for image zoom modal
+    const [editProduct,setEditProduct]= useState(null)   // for edit modal
+    const [editLoading,setEditLoading]= useState(false)
+
+    const userRole = localStorage.getItem('role') || 'user'
+    const isAdmin  = userRole === 'admin'
+    const isStaff  = userRole === 'staff'
+
+    // Load products on mount and when refreshTrigger changes
     useEffect(() => {
-        fetchProducts();
-    }, [refreshTrigger]);
+        loadProducts()
+    }, [refreshTrigger])
 
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/product`, {
-                headers: { authorization: localStorage.getItem('token') }
-            });
-            setProducts(response.data);
+            const token = localStorage.getItem('token')
+            const res = await axios.get(`${BASE_URL}/api/product`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            setProducts(res.data)
         } catch (err) {
-            console.log("Error fetching product:", err);
+            console.error('Could not load products:', err.message)
         }
-    };
+    }
 
-    const getImageUrl = (img) => {
-        if (!img) return "https://via.placeholder.com/300?text=No+Image";
-        // If it's already a full URL (like Unsplash), return as is
-        if (img.startsWith("http")) return img;
-        // Otherwise, serve it from the backend uploads folder (Points #1 and #2)
-        return `${BASE_URL}/uploads/${img}`;
-    };
-
+    // Delete a product
     const deleteProduct = async (id) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
-            try {
-                await axios.delete(`${BASE_URL}/api/product/${id}`, {
-                    headers: { authorization: localStorage.getItem('token') }
-                });
-                fetchProducts();
-            } catch (err) {
-                console.log("Error fetching while deleting a product:", err);
-            }
+        if (!window.confirm('Delete this product?')) return
+        try {
+            const token = localStorage.getItem('token')
+            await axios.delete(`${BASE_URL}/api/product/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            loadProducts()
+        } catch (err) {
+            alert(err.response?.data?.error || 'Delete failed')
         }
-    };
+    }
 
-    const editProduct = async (product) => {
-        const newName = prompt("Edit name", product.name);
-        if (newName && newName !== product.name) {
-            try {
-                await axios.put(`${BASE_URL}/api/product/${product._id}`, { ...product, name: newName }, {
-                    headers: { authorization: localStorage.getItem('token') }
-                });
-                fetchProducts();
-            } catch (err) {
-                console.log("Error fetching while updating a product:", err.response?.data);
-            }
+    // Open edit modal with current product data
+    const openEdit = (product) => {
+        setEditProduct({
+            _id:         product._id,
+            name:        product.name        || '',
+            sku:         product.sku         || '',
+            category:    product.category    || '',
+            price:       product.price       || '',
+            description: product.description || '',
+            barcode:     product.barcode     || '',
+            image:       product.image       || null,  // current image URL
+            newImageFile:null                          // new image the user picks
+        })
+    }
+
+    // Save edited product
+    const saveEdit = async () => {
+        if (!editProduct.name || !editProduct.sku || !editProduct.category || !editProduct.price) {
+            alert('Name, SKU, Category and Price are required')
+            return
         }
-    };
 
-    const filteredProducts = products.filter(p => 
-        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        setEditLoading(true)
+        try {
+            const token = localStorage.getItem('token')
+
+            // Use FormData so we can send both text and optional new image
+            const formData = new FormData()
+            formData.append('name',        editProduct.name)
+            formData.append('sku',         editProduct.sku)
+            formData.append('category',    editProduct.category)
+            formData.append('price',       editProduct.price)
+            formData.append('description', editProduct.description)
+            if (editProduct.barcode)     formData.append('barcode', editProduct.barcode)
+            if (editProduct.newImageFile) formData.append('image',  editProduct.newImageFile) // upload new image to cloudinary
+
+            await axios.put(`${BASE_URL}/api/product/${editProduct._id}`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+
+            setEditProduct(null)
+            loadProducts()
+        } catch (err) {
+            alert(err.response?.data?.error || 'Update failed')
+        } finally {
+            setEditLoading(false)
+        }
+    }
+
+    // Filter products by search query
+    const filtered = products.filter(p =>
+        (p.name     || '').toLowerCase().includes(search.toLowerCase()) ||
+        (p.sku      || '').toLowerCase().includes(search.toLowerCase()) ||
+        (p.category || '').toLowerCase().includes(search.toLowerCase())
+    )
 
     return (
-        <div className="flex flex-col h-full bg-white/40 backdrop-blur-md rounded-3xl p-4 md:p-8 border border-white/20 shadow-xl">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+
+            {/* Search bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Inventory Products</h2>
-                    <p className="text-slate-500 text-sm mt-1">Manage and track your warehouse stock level</p>
+                    <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>All Products</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#94a3b8' }}>{filtered.length} items</p>
                 </div>
-                
-                <div className="relative w-full md:w-80">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-white border border-slate-200 text-slate-900 text-sm rounded-2xl focus:ring-2 focus:ring-[#00A19B] focus:border-[#00A19B] block w-full pl-12 p-3.5 shadow-sm transition-all outline-none"
-                    />
-                </div>
+                <input
+                    type="text"
+                    placeholder="🔍  Search by name, SKU or category..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    style={{
+                        padding: '10px 16px', border: '1.5px solid #e2e8f0', borderRadius: '12px',
+                        fontSize: '14px', outline: 'none', width: '280px', color: '#0f172a'
+                    }}
+                />
             </div>
 
-            {/* Desktop View */}
-            <div className="hidden lg:block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th className="p-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Product</th>
-                            <th className="p-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
-                            <th className="p-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Price</th>
-                            {(userRole === 'admin' || userRole === 'staff') && (
-                                <th className="p-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {filteredProducts.length > 0 ? (
-                            filteredProducts.map((p) => (
-                                <tr key={p._id} className="hover:bg-slate-50 transition-all duration-200 group">
-                                    <td className="p-5">
-                                        <div className="flex items-center gap-5">
-                                            <div 
-                                                className="h-20 w-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 shadow-sm cursor-zoom-in group-hover:shadow-md transition-all"
-                                                onClick={() => setSelectedImage(p.image)}
-                                            >
-                                                <img 
-                                                    src={getImageUrl(p.image)} 
-                                                    alt={p.name} 
-                                                    className="h-full w-full object-cover"
-                                                    onError={(e) => { 
-                                                        e.target.onerror = null; 
-                                                        e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%2364748b'>No Image</text></svg>"; 
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-lg font-bold text-slate-900 leading-tight">{p.name}</span>
-                                                <div className="flex items-center gap-3 mt-1.5">
-                                                    <span className="text-[10px] font-black uppercase tracking-wider text-[#00A19B] bg-[#00A19B]/5 px-2 py-0.5 rounded">SKU: {p.sku}</span>
-                                                    {p.barcode && <span className="text-[10px] text-slate-400 font-mono">Barcode: {p.barcode}</span>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-5">
-                                        <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                            {p.category}
-                                        </span>
-                                    </td>
-                                    <td className="p-5">
-                                        <span className="text-xl font-black text-slate-900">₹{p.price.toLocaleString()}</span>
-                                    </td>
-                                    {(userRole === 'admin' || userRole === 'staff') && (
-                                        <td className="p-5 text-right">
-                                            <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                                                <button 
-                                                    onClick={() => editProduct(p)}
-                                                    className="p-3 bg-white hover:bg-slate-50 text-slate-600 rounded-xl transition-all border border-slate-200 shadow-sm hover:shadow-md"
-                                                    title="Edit Product"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                                </button>
-                                                <button 
-                                                    onClick={() => deleteProduct(p._id)}
-                                                    className="p-3 bg-white hover:bg-red-50 text-red-500 rounded-xl transition-all border border-slate-200 shadow-sm hover:shadow-md"
-                                                    title="Delete Product"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    )}
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="p-20 text-center text-slate-400">
-                                    <div className="flex flex-col items-center gap-4">
-                                        <div className="text-5xl opacity-20">📦</div>
-                                        <p className="font-bold text-lg">No products found matching your search</p>
-                                        <button onClick={() => setSearchQuery("")} className="text-[#00A19B] font-black hover:underline uppercase tracking-widest text-xs">Clear Filter</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Mobile View */}
-            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {filteredProducts.length > 0 ? (
-                    filteredProducts.map((p) => (
-                        <div key={p._id} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-md flex flex-col group">
-                            <div className="relative h-64 bg-slate-100 overflow-hidden cursor-zoom-in" onClick={() => setSelectedImage(p.image)}>
-                                <img 
-                                    src={getImageUrl(p.image)} 
-                                    alt={p.name} 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                    onError={(e) => { 
-                                        e.target.onerror = null; 
-                                        e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%2364748b'>No Image</text></svg>"; 
-                                    }}
-                                />
-                                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-xl border border-white/50">
-                                    <span className="text-lg font-black text-slate-900">₹{p.price}</span>
-                                </div>
-                            </div>
-                            <div className="p-6 space-y-4">
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-1">{p.name}</h3>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] bg-slate-50 text-slate-400 border border-slate-100 px-2 py-0.5 rounded font-mono">SKU: {p.sku}</span>
-                                        <span className="text-[10px] bg-[#00A19B]/5 text-[#00A19B] border border-[#00A19B]/10 px-2 py-0.5 rounded font-black uppercase tracking-widest">{p.category}</span>
-                                    </div>
-                                </div>
-                                {(userRole === 'admin' || userRole === 'staff') && (
-                                    <div className="flex gap-2 pt-4 border-t border-slate-100">
-                                        <button onClick={() => editProduct(p)} className="flex-1 py-3 bg-slate-50 hover:bg-slate-100 text-slate-900 rounded-xl font-black transition-all border border-slate-200 text-xs flex items-center justify-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            Edit
-                                        </button>
-                                        <button onClick={() => deleteProduct(p._id)} className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black transition-all border border-red-100 text-xs flex items-center justify-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-200">
-                        <p className="text-slate-400 font-bold">No results found</p>
+            {/* Product Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+                {filtered.length === 0 && (
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📦</div>
+                        <p style={{ fontWeight: 700 }}>No products found</p>
                     </div>
                 )}
+
+                {filtered.map(p => (
+                    <div key={p._id} style={{
+                        background: 'white', borderRadius: '16px',
+                        border: '1px solid #f1f5f9', overflow: 'hidden',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        transition: 'box-shadow 0.2s',
+                    }}>
+
+                        {/* Product Image — click to zoom */}
+                        <div
+                            onClick={() => setBigImage(p.image)}
+                            style={{ height: '180px', overflow: 'hidden', background: '#f8fafc', cursor: 'zoom-in' }}
+                        >
+                            <img
+                                src={p.image || NO_IMAGE}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={e => { e.target.onerror = null; e.target.src = NO_IMAGE }}
+                            />
+                        </div>
+
+                        {/* Product Info */}
+                        <div style={{ padding: '14px' }}>
+                            <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>{p.name}</h3>
+                            <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#94a3b8' }}>SKU: {p.sku}</p>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                <span style={{
+                                    fontSize: '11px', fontWeight: 700, padding: '3px 8px',
+                                    background: '#f0fdf4', color: '#16a34a', borderRadius: '20px'
+                                }}>
+                                    {p.category}
+                                </span>
+                                <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>₹{Number(p.price).toLocaleString()}</span>
+                            </div>
+
+                            {/* Edit / Delete — only for admin and staff */}
+                            {(isAdmin || isStaff) && (
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    {isAdmin && (
+                                        <button
+                                            onClick={() => openEdit(p)}
+                                            style={btnStyle('#e0f2fe', '#0369a1')}
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                    )}
+                                    {isAdmin && (
+                                        <button
+                                            onClick={() => deleteProduct(p._id)}
+                                            style={btnStyle('#fef2f2', '#dc2626')}
+                                        >
+                                            🗑️ Delete
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            {/* Modal for full image viewing */}
-            {selectedImage && (
-                <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 animate-page-fade" onClick={() => setSelectedImage(null)}>
-                    <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center">
-                        <button className="absolute top-0 right-0 m-4 p-4 text-white hover:text-[#00A19B] transition-colors" onClick={() => setSelectedImage(null)}>
-                            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                        <img 
-                            src={getImageUrl(selectedImage)} 
-                            alt="Full preview" 
-                            className="max-w-full max-h-full object-contain rounded-3xl shadow-2xl border border-white/20"
-                            onClick={(e) => e.stopPropagation()}
-                            onError={(e) => { 
-                                e.target.onerror = null; 
-                                e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'><rect width='100%' height='100%' fill='%230f172a'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='20' fill='%2394a3b8'>Image Load Error</text></svg>"; 
-                            }}
-                        />
+            {/* ── Image Zoom Modal ──────────────────────────────────────────── */}
+            {bigImage && (
+                <div
+                    onClick={() => setBigImage(null)}
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 1000,
+                        background: 'rgba(0,0,0,0.85)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: '24px'
+                    }}
+                >
+                    <img
+                        src={bigImage}
+                        alt="Full view"
+                        style={{ maxWidth: '90vw', maxHeight: '85vh', borderRadius: '16px', objectFit: 'contain' }}
+                        onError={e => { e.target.onerror = null; e.target.src = NO_IMAGE }}
+                        onClick={e => e.stopPropagation()}
+                    />
+                    <button
+                        onClick={() => setBigImage(null)}
+                        style={{
+                            position: 'fixed', top: '16px', right: '16px',
+                            background: 'white', border: 'none', borderRadius: '50%',
+                            width: '40px', height: '40px', fontSize: '18px',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                    >✕</button>
+                </div>
+            )}
+
+            {/* ── Edit Product Modal ────────────────────────────────────────── */}
+            {editProduct && (
+                <div
+                    onClick={() => setEditProduct(null)}
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 1000,
+                        background: 'rgba(0,0,0,0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: '16px'
+                    }}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: 'white', borderRadius: '20px',
+                            width: '100%', maxWidth: '480px',
+                            maxHeight: '90vh', overflowY: 'auto'
+                        }}
+                    >
+                        {/* Modal Header */}
+                        <div style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '20px 24px', borderBottom: '1px solid #f1f5f9'
+                        }}>
+                            <h3 style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>Edit Product</h3>
+                            <button onClick={() => setEditProduct(null)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div style={{ padding: '24px' }}>
+
+                            {/* Current image + option to change */}
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={labelStyle}>Product Image</label>
+                                <img
+                                    src={editProduct.newImageFile ? URL.createObjectURL(editProduct.newImageFile) : (editProduct.image || NO_IMAGE)}
+                                    alt="current"
+                                    style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #e2e8f0' }}
+                                    onError={e => { e.target.onerror = null; e.target.src = NO_IMAGE }}
+                                />
+                                <label style={{ display: 'block', marginTop: '8px', cursor: 'pointer' }}>
+                                    <span style={{ fontSize: '13px', color: '#00A19B', fontWeight: 700 }}>📸 Change image</span>
+                                    <input
+                                        type="file" accept="image/*" style={{ display: 'none' }}
+                                        onChange={e => {
+                                            if (e.target.files[0]) setEditProduct(p => ({ ...p, newImageFile: e.target.files[0] }))
+                                        }}
+                                    />
+                                </label>
+                            </div>
+
+                            {/* Text fields */}
+                            {[
+                                { label: 'Name *',      key: 'name' },
+                                { label: 'SKU *',       key: 'sku' },
+                                { label: 'Category *',  key: 'category' },
+                                { label: 'Price (₹) *', key: 'price', type: 'number' },
+                                { label: 'Barcode',     key: 'barcode' },
+                                { label: 'Description', key: 'description', textarea: true }
+                            ].map(field => (
+                                <div key={field.key} style={{ marginBottom: '12px' }}>
+                                    <label style={labelStyle}>{field.label}</label>
+                                    {field.textarea
+                                        ? <textarea
+                                            rows={3}
+                                            style={{ ...inputStyle, resize: 'none' }}
+                                            value={editProduct[field.key]}
+                                            onChange={e => setEditProduct(p => ({ ...p, [field.key]: e.target.value }))}
+                                          />
+                                        : <input
+                                            type={field.type || 'text'}
+                                            style={inputStyle}
+                                            value={editProduct[field.key]}
+                                            onChange={e => setEditProduct(p => ({ ...p, [field.key]: e.target.value }))}
+                                          />
+                                    }
+                                </div>
+                            ))}
+
+                            {/* Buttons */}
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                <button
+                                    onClick={() => setEditProduct(null)}
+                                    style={{ flex: 1, padding: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', cursor: 'pointer', fontWeight: 700 }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={saveEdit}
+                                    disabled={editLoading}
+                                    style={{ flex: 1, padding: '12px', background: editLoading ? '#94a3b8' : '#00A19B', color: 'white', border: 'none', borderRadius: '10px', cursor: editLoading ? 'not-allowed' : 'pointer', fontWeight: 700 }}
+                                >
+                                    {editLoading ? '⏳ Saving...' : '✅ Save Changes'}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
-            
-            <div className="mt-8 flex justify-between items-center text-sm font-black text-slate-400 uppercase tracking-widest bg-slate-50 p-4 rounded-2xl border border-slate-200 px-6">
-                <span>Displaying <span className="text-slate-900">{filteredProducts.length}</span> items</span>
-                <span className="hidden sm:inline">Warehouse Management Suite v1.0</span>
-            </div>
         </div>
-    );
+    )
 }
+
+// Shared styles
+const labelStyle = {
+    display: 'block', fontSize: '12px', fontWeight: 700, color: '#64748b',
+    marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'
+}
+
+const inputStyle = {
+    width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0',
+    borderRadius: '10px', fontSize: '14px', color: '#0f172a',
+    outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit'
+}
+
+const btnStyle = (bg, color) => ({
+    flex: 1, padding: '8px', background: bg, color,
+    border: 'none', borderRadius: '8px', cursor: 'pointer',
+    fontSize: '12px', fontWeight: 700
+})
