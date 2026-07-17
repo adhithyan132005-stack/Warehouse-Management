@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const crypto = require('crypto');
 
-// Initialize Google OAuth client
-// We get the Client ID from environment variables
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const verifyGoogleLogin = async (req, res) => {
@@ -15,7 +14,7 @@ const verifyGoogleLogin = async (req, res) => {
             return res.status(400).json({ error: 'Google credential token is required' });
         }
 
-        // Verify Google token
+        
         let ticket;
         try {
             ticket = await client.verifyIdToken({
@@ -37,27 +36,25 @@ const verifyGoogleLogin = async (req, res) => {
             return res.status(400).json({ error: 'Google email is not verified' });
         }
 
-        // Check if user already exists
+        
         let user = await User.findOne({ email });
 
         if (!user) {
-            // Register a new user
-            // Generate a random secure password since password is required / used in normal login
             const tempPassword = crypto.randomBytes(16).toString('hex');
             const salt = await bcryptjs.genSalt();
             const hashedPassword = await bcryptjs.hash(tempPassword, salt);
 
-            // Determine username
+            
             const username = name || email.split('@')[0];
 
             user = new User({
                 username,
                 email,
                 password: hashedPassword,
-                role: 'user', // default role
+                role: 'user', 
             });
 
-            // Check if this is the first user overall (to assign admin role, matching standard registration flow)
+            
             const userCount = await User.countDocuments();
             if (userCount === 0) {
                 user.role = 'admin';
@@ -66,7 +63,7 @@ const verifyGoogleLogin = async (req, res) => {
             await user.save();
         }
 
-        // Generate application JWT
+        
         if (!process.env.JWT_SECRET) {
             console.error('CRITICAL ERROR: JWT_SECRET environment variable is not defined!');
             return res.status(500).json({ error: 'Server configuration error (JWT_SECRET missing)' });

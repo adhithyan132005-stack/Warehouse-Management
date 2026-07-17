@@ -14,7 +14,6 @@ async function seed() {
         await Location.deleteMany({});
         await Inventory.deleteMany({});
 
-        // Create locations (Zone A to Zone E, with rack numbers)
         const zones = ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'];
         const locations = [];
         
@@ -30,7 +29,6 @@ async function seed() {
         console.log('Inserting new locations...');
         const createdLocations = await Location.insertMany(locations);
         
-        // Find all products
         const products = await Product.find({});
         console.log(`Found ${products.length} products. Seeding stock of 50 for each...`);
 
@@ -42,7 +40,7 @@ async function seed() {
                 locationId: location._id,
                 quantity: 50,
                 batchNumber: `BAT-INIT-${1000 + idx}`,
-                expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year expiry
+                expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
             });
         });
 

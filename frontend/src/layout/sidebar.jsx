@@ -53,7 +53,7 @@ export default function Sidebar({ role, onClose }) {
           Dashboard
         </NavLink>
 
-        {/* --- REGULAR USER SIDEBAR SECTION --- */}
+        
         {effectiveRole === "user" && (
           <>
             <p className="pt-4 text-xs uppercase tracking-[0.3em] text-black">Customer Area</p>
@@ -76,7 +76,7 @@ export default function Sidebar({ role, onClose }) {
           </>
         )}
 
-        {/* --- ADMIN / STAFF SIDEBAR SECTION --- */}
+        
         {(isAdmin || isStaff) && (
           <>
             <p className="pt-4 text-xs uppercase tracking-[0.3em] text-black">Operations</p>

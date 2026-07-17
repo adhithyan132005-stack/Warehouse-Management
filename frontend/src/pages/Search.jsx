@@ -27,7 +27,6 @@ export default function Search() {
             const headers = { Authorization: `Bearer ${token}` }
             const qLower = query.toLowerCase()
 
-            // Fetch all and filter client side for simplicity, ideally backend gives search APIs
             const [prodRes, orderRes, supRes] = await Promise.all([
                 axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/product", { headers }).catch(() => ({ data: [] })),
                 axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/orders", { headers }).catch(() => ({ data: [] })),
@@ -86,7 +85,6 @@ export default function Search() {
                 </div>
             )}
 
-            {/* Products */}
             {products.length > 0 && (
                 <div className="glass-card rounded-[28px] p-6">
                     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">📦 Products ({products.length})</h2>
@@ -102,7 +100,6 @@ export default function Search() {
                 </div>
             )}
 
-            {/* Orders */}
             {orders.length > 0 && (
                 <div className="glass-card rounded-[28px] p-6">
                     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">🧾 Orders ({orders.length})</h2>
@@ -121,7 +118,6 @@ export default function Search() {
                 </div>
             )}
 
-            {/* Suppliers */}
             {suppliers.length > 0 && (
                 <div className="glass-card rounded-[28px] p-6">
                     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">🏢 Suppliers ({suppliers.length})</h2>

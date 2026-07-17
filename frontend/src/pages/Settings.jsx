@@ -64,7 +64,7 @@ export default function Settings() {
                 <p style={styles.subtitle}>Manage your account information</p>
             </div>
 
-            {/* Profile Card */}
+            
             <div style={styles.profileCard}>
                 <div style={styles.avatarSection}>
                     <div style={styles.avatar}>
@@ -89,7 +89,7 @@ export default function Settings() {
                     </div>
                 )}
 
-                {/* Info Rows */}
+                
                 <div style={styles.infoSection}>
                     <div style={styles.infoRow}>
                         <span style={styles.infoLabel}>👤 Full Name</span>
@@ -137,7 +137,7 @@ export default function Settings() {
 
                 <div style={styles.divider}></div>
 
-                {/* Buttons */}
+                
                 <div style={styles.buttonRow}>
                     {editing ? (
                         <>
@@ -170,7 +170,7 @@ export default function Settings() {
                 </div>
             </div>
 
-            {/* Account Stats */}
+            
             <div style={styles.statsGrid}>
                 <div style={styles.statCard}>
                     <span style={styles.statIcon}>📦</span>

@@ -2,18 +2,14 @@ const Product = require('../Model/product-model')
 
 const productController = {}
 
-// ── CREATE a new product ──────────────────────────────────────────────────────
 productController.create = async (req, res) => {
     const { name, sku, category, price, barcode, description } = req.body
 
-    // Check required fields
     if (!name || !sku || !category || !price) {
         return res.status(400).json({ error: 'name, sku, category and price are required' })
     }
 
     try {
-        // If user uploaded an image, req.file.path = the Cloudinary URL
-        // If no image uploaded, image stays null
         const imageUrl = req.file ? req.file.path : null
 
         const product = new Product({
@@ -31,7 +27,6 @@ productController.create = async (req, res) => {
         res.status(201).json({ message: 'Product created successfully', product })
 
     } catch (err) {
-        // SKU already exists
         if (err.code === 11000) {
             return res.status(409).json({ error: 'SKU already exists' })
         }
@@ -39,7 +34,6 @@ productController.create = async (req, res) => {
     }
 }
 
-// ── GET all products ──────────────────────────────────────────────────────────
 productController.list = async (req, res) => {
     try {
         const products = await Product.find().sort({ createdAt: -1 })
@@ -49,7 +43,6 @@ productController.list = async (req, res) => {
     }
 }
 
-// ── GET one product by ID ─────────────────────────────────────────────────────
 productController.show = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
@@ -60,12 +53,10 @@ productController.show = async (req, res) => {
     }
 }
 
-// ── UPDATE a product ──────────────────────────────────────────────────────────
 productController.update = async (req, res) => {
     try {
         const updateData = { ...req.body }
 
-        // If a new image was uploaded, update the image URL
         if (req.file) {
             updateData.image = req.file.path
         }
@@ -79,7 +70,6 @@ productController.update = async (req, res) => {
     }
 }
 
-// ── DELETE a product ──────────────────────────────────────────────────────────
 productController.delete = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id)
@@ -90,7 +80,6 @@ productController.delete = async (req, res) => {
     }
 }
 
-// ── FIND product by barcode ───────────────────────────────────────────────────
 productController.barcode = async (req, res) => {
     try {
         const product = await Product.findOne({ barcode: req.params.code })

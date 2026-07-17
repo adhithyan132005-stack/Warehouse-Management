@@ -1,104 +1,30 @@
 import BarcodeScannerComponent from "react-qr-barcode-scanner"
-import axios from "axios"
-import { useState } from "react"
 
-export default function Barcode() {
-    const [formData, setFormData] = useState({
-        name: "",
-        category: "",
-        price: "",
-        barcode: "",
-        quantity: ""
-    })
-    const [message, setMessage] = useState("")
-
-
-    const handleSave = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.post("https://warehouse-management-backend-t3q2.onrender.com/api/product", formData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            alert("product saved ✅")
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    const handlescan = async (result) => {
-        if (!result) return
-
-
-        const code = result.getText ? result.getText() : result.text
-        setFormData((prev) => ({ ...prev, barcode: code }))
-
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`https://warehouse-management-backend-t3q2.onrender.com/api/barcode?code=${encodeURIComponent(code)}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            setFormData({
-                name: response.data.name,
-                category: response.data.category,
-                price: response.data.price,
-                barcode: response.data.barcode,
-                quantity: response.data.quantity
-            })
-            setMessage("product found ✅")
-        } catch (err) {
-            setMessage("New product ➕ Enter Details")
-            setFormData((prev) => ({
-                ...prev,
-                name: "",
-                category: "",
-                price: "",
-                quantity: ""
-            }))
-        }
-    }
-
+export default function Barcode({ onScan, close }) {
     return (
         <div>
-            <h2>Scan Barcode</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ margin: 0, fontWeight: 700 }}>Scan Barcode</h3>
+                <button
+                    onClick={close}
+                    style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}
+                >
+                    ✕
+                </button>
+            </div>
             <BarcodeScannerComponent
-                width={400}
-                height={300}
+                width="100%"
+                height={260}
                 onUpdate={(err, result) => {
-                    if (result) handlescan(result)
+                    if (result) {
+                        const code = result.getText ? result.getText() : result.text
+                        if (code) onScan(code)
+                    }
                 }}
             />
-            <h3>{message}</h3>
-
-            <input
-                placeholder="Product Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-
-            <input
-                placeholder="Category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            />
-
-            <input
-                placeholder="Price"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            />
-
-            <input
-                placeholder="Quantity"
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-            />
-
-
-            <button onClick={handleSave}>Save Product</button>
+            <p style={{ textAlign: 'center', fontSize: '13px', color: '#94a3b8', marginTop: '10px' }}>
+                Point your camera at a barcode
+            </p>
         </div>
     )
 }

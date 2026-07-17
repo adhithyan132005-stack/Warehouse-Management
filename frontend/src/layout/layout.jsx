@@ -7,7 +7,7 @@ export default function Layout({ children, role }) {
 
   return (
     <div className="app-layout min-h-screen bg-[#E4DDD3] text-slate-900 flex overflow-hidden">
-      {/* Mobile Sidebar Overlay */}
+      
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity"
@@ -15,7 +15,7 @@ export default function Layout({ children, role }) {
         />
       )}
 
-      {/* Sidebar Container */}
+      
       <div className={`
         fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}

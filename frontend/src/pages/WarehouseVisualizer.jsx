@@ -10,7 +10,6 @@ export default function WarehouseVisualizer() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all warehouse locations
   const fetchLocations = async () => {
     try {
       const response = await axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/locations", {
@@ -19,7 +18,6 @@ export default function WarehouseVisualizer() {
       
       const locs = response.data;
       
-      // Group by Zone
       const grouped = {};
       locs.forEach((loc) => {
         if (!grouped[loc.zone]) {
@@ -39,7 +37,6 @@ export default function WarehouseVisualizer() {
     fetchLocations();
   }, []);
 
-  // Handle clicking a rack
   const handleRackClick = async (rack) => {
     setSelectedRack(rack);
     setLoadingProducts(true);
@@ -63,9 +60,7 @@ export default function WarehouseVisualizer() {
     setRackProducts([]);
   };
 
-  // Determine color/status of a rack based on capacity (if available)
   const getRackStatusClass = (rack) => {
-    // If we have totalQty mapped, we can use it. The location API we saw earlier returns totalQty.
     const capacity = rack.capacity || 100;
     const qty = rack.totalQty || 0;
     const fillPercentage = (qty / capacity) * 100;

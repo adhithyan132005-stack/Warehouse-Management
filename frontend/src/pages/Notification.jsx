@@ -44,10 +44,7 @@ export default function Notification(){
                 <>
                     <div className="bell" onClick={handleClick}> 🔔
             
-                    {/* {alerts.length>0 && (
-                        <span className="badge-count">{alerts.length}</span>
-
-                    )} */}
+                    
                             {unreadCount > 0 && (
                 <span className="badge-count">{unreadCount}</span>
             )}

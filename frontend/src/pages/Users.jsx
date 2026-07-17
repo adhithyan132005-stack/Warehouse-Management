@@ -29,7 +29,7 @@ export default function Users() {
             await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/users/${userId}/role`, { role: newRole }, {
                 headers: { authorization: localStorage.getItem('token') }
             })
-            fetchUsers() // Refresh list
+            fetchUsers()
         } catch (err) {
             alert("Failed to update role")
             console.log(err)

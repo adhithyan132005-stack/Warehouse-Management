@@ -10,14 +10,12 @@ export default function PaymentPage(){
     const [processing, setProcessing] = useState(false)
     const [success, setSuccess] = useState(false)
 
-    // Card form fields (for UI only — test mode)
     const [cardNumber, setCardNumber] = useState("")
     const [cardExpiry, setCardExpiry] = useState("")
     const [cardCvv, setCardCvv] = useState("")
     const [cardName, setCardName] = useState("")
     const [upiId, setUpiId] = useState("")
 
-    // Dynamic Backend URL detection
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const BASE_URL = isLocal 
         ? "http://localhost:4444" 
@@ -85,7 +83,6 @@ export default function PaymentPage(){
         </div>
     )
 
-    // Success screen
     if (success) return (
         <div style={styles.pageContainer}>
             <div style={{ ...styles.card, textAlign: "center", padding: "60px 40px" }}>
@@ -102,14 +99,14 @@ export default function PaymentPage(){
         <div style={styles.pageContainer}>
             <div style={styles.mainGrid}>
 
-                {/* Left — Payment Form */}
+                
                 <div style={styles.card}>
                     <div style={styles.cardHeader}>
                         <div style={styles.secureBadge}>🔒 Secure Payment</div>
                         <h2 style={styles.cardTitle}>Choose Payment Method</h2>
                     </div>
 
-                    {/* Payment method tabs */}
+                    
                     <div style={styles.tabs}>
                         {[
                             { key: "card", icon: "💳", label: "Card" },
@@ -130,7 +127,7 @@ export default function PaymentPage(){
                         ))}
                     </div>
 
-                    {/* Card Form */}
+                    
                     {paymentMethod === "card" && (
                         <div style={styles.formSection}>
                             <div style={styles.inputGroup}>
@@ -178,7 +175,7 @@ export default function PaymentPage(){
                         </div>
                     )}
 
-                    {/* UPI Form */}
+                    
                     {paymentMethod === "upi" && (
                         <div style={styles.formSection}>
                             <div style={styles.inputGroup}>
@@ -198,7 +195,7 @@ export default function PaymentPage(){
                         </div>
                     )}
 
-                    {/* Net Banking */}
+                    
                     {paymentMethod === "netbanking" && (
                         <div style={styles.formSection}>
                             <div style={styles.inputGroup}>
@@ -216,7 +213,7 @@ export default function PaymentPage(){
                         </div>
                     )}
 
-                    {/* Pay Button */}
+                    
                     <button
                         style={{
                             ...styles.payButton,
@@ -240,7 +237,7 @@ export default function PaymentPage(){
                     </p>
                 </div>
 
-                {/* Right — Order Summary */}
+                
                 <div style={styles.summaryCard}>
                     <h3 style={styles.summaryTitle}>Order Summary</h3>
 

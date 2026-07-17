@@ -9,16 +9,14 @@ export default function OrderTracking() {
     const [error, setError] = useState("")
     const navigate = useNavigate()
 
-    // Check for auto-filled order number from localStorage
     useEffect(() => {
         const lastCreatedOrder = localStorage.getItem('lastCreatedOrder');
         if (lastCreatedOrder) {
             setOrderNumber(lastCreatedOrder);
-            localStorage.removeItem('lastCreatedOrder'); // Clear it after use
-            // Auto-track the order
+            localStorage.removeItem('lastCreatedOrder');
             setTimeout(() => {
                 handleTrackOrder(lastCreatedOrder);
-            }, 500); // Small delay to show the filled input
+            }, 500);
         }
     }, [])
 
@@ -41,7 +39,6 @@ export default function OrderTracking() {
             console.log("📦 API Response:", response.data)
             console.log("📊 Total activities found:", response.data.length)
 
-            // Filter and sort activities
             const orderActivities = response.data
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
@@ -95,10 +92,8 @@ export default function OrderTracking() {
             day: 'numeric'
         })
 
-        // Convert to lowercase for case-insensitive matching
         const lowerMessage = message.toLowerCase()
         
-        console.log("Activity message:", message) // Debug: check what messages are coming from backend
 
         if (lowerMessage.includes("was placed")) {
             return `Your order was placed at ${timeString} on ${dateString}`
@@ -112,7 +107,6 @@ export default function OrderTracking() {
             return `Your order was successfully delivered at ${timeString} on ${dateString}`
         }
         
-        // If no conditions match, show the original message
         return message
     }
 
@@ -233,7 +227,7 @@ export default function OrderTracking() {
                         </button>
                     </div>
                     
-                    {/* Current Status Summary */}
+                    
                     <div style={{ 
                         marginBottom: "20px", 
                         padding: "20px", 
@@ -268,9 +262,9 @@ export default function OrderTracking() {
                     <div style={{ marginBottom: "20px", padding: "20px", backgroundColor: "#f8f9fa", borderRadius: "8px", border: "1px solid #e9ecef" }}>
                         <h4 style={{ margin: "0 0 20px 0", color: "#495057", fontSize: "16px", fontWeight: "600" }}>📊 Order Progress</h4>
                         
-                        {/* Progress Steps */}
+                        
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", paddingTop: "30px", paddingBottom: "10px" }}>
-                            {/* Progress Line Background */}
+                            
                             <div style={{
                                 position: "absolute",
                                 top: "35px",
@@ -281,7 +275,7 @@ export default function OrderTracking() {
                                 zIndex: 1
                             }}></div>
                             
-                            {/* Active Progress Line */}
+                            
                             <div style={{
                                 position: "absolute",
                                 top: "35px",
@@ -368,7 +362,7 @@ export default function OrderTracking() {
                             </h4>
                             
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px", position: "relative" }}>
-                                {/* Timeline line */}
+                                
                                 <div style={{
                                     position: "absolute",
                                     left: "32px",
@@ -397,7 +391,7 @@ export default function OrderTracking() {
                                             marginLeft: "20px"
                                         }}
                                     >
-                                        {/* Timeline dot */}
+                                        
                                         <div style={{
                                             position: "absolute",
                                             left: "-25px",

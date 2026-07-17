@@ -222,7 +222,7 @@ export default function OTPLogin({ onLogin }) {
           )}
 
           <form onSubmit={handleLogin} noValidate>
-            {/* Email */}
+            
             <div style={s.fieldWrap}>
               <label style={s.label} htmlFor="l-email">Email address</label>
               <input
@@ -238,7 +238,7 @@ export default function OTPLogin({ onLogin }) {
               {fieldErrors.email && <p style={s.fieldErr}>{fieldErrors.email}</p>}
             </div>
 
-            {/* Password */}
+            
             <div style={s.fieldWrap}>
               <label style={s.label} htmlFor="l-password">Password</label>
               <div style={s.inputWrap}>
@@ -259,7 +259,7 @@ export default function OTPLogin({ onLogin }) {
               {fieldErrors.password && <p style={s.fieldErr}>{fieldErrors.password}</p>}
             </div>
 
-            {/* Remember me */}
+            
             <div style={s.row}>
               <label style={s.checkLabel}>
                 <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} style={s.checkbox} />
@@ -267,7 +267,7 @@ export default function OTPLogin({ onLogin }) {
               </label>
             </div>
 
-            {/* Submit */}
+            
             <button
               type="submit"
               disabled={loading || gLoading}
@@ -285,14 +285,14 @@ export default function OTPLogin({ onLogin }) {
             </button>
           </form>
 
-          {/* Divider */}
+          
           <div style={s.divider}>
             <div style={s.divLine}/>
             <span style={s.divText}>or continue with</span>
             <div style={s.divLine}/>
           </div>
 
-          {/* Google */}
+          
           <div style={s.googleWrap}>
             {gLoading ? (
               <div style={s.gLoadWrap}>
@@ -315,7 +315,7 @@ export default function OTPLogin({ onLogin }) {
             )}
           </div>
 
-          {/* Footer */}
+          
           <div style={s.footer}>
             Don't have an account?{" "}
             <button style={s.footerLink} onClick={() => navigate("/register")}>

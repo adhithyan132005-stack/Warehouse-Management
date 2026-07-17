@@ -15,7 +15,6 @@ export default function CreateOrder() {
     const [isCheckingOut, setIsCheckingOut] = useState(false)
     const navigate = useNavigate()
 
-    // Save cart state to local storage when it changes
     useEffect(() => {
         localStorage.setItem('activeCart', JSON.stringify(cart))
     }, [cart])
@@ -30,9 +29,8 @@ export default function CreateOrder() {
         'Cosmetics'
     ]
 
-    const pageSize = 6 // Showing 6 products per page fits the split layout beautifully
+    const pageSize = 6
 
-    // Dynamic Backend URL detection
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const BASE_URL = isLocal 
         ? "http://localhost:4444" 
@@ -216,10 +214,10 @@ export default function CreateOrder() {
                 ))}
             </div>
 
-            {/* Split Screen Layout */}
+            
             <div className="flex flex-col xl:flex-row gap-8 items-start mt-6">
                 
-                {/* Left Side: Product Grid */}
+                
                 <div className="flex-1 w-full">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20">
@@ -313,7 +311,7 @@ export default function CreateOrder() {
                         </div>
                     )}
 
-                    {/* Pagination Controls */}
+                    
                     {totalPages > 1 && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-glass)', border: '1px solid var(--border-glass)', padding: '16px', borderRadius: '16px', marginTop: '24px' }}>
                             <button
@@ -337,7 +335,7 @@ export default function CreateOrder() {
                     )}
                 </div>
 
-                {/* Right Side: Interactive Shopping Cart */}
+                
                 <div style={{
                     width: '100%',
                     maxWidth: '400px',
@@ -370,7 +368,7 @@ export default function CreateOrder() {
                         )}
                     </div>
 
-                    {/* Cart Items List */}
+                    
                     <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', margin: '16px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {cart.length === 0 ? (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '220px', textAlign: 'center' }}>
@@ -422,7 +420,7 @@ export default function CreateOrder() {
                         )}
                     </div>
 
-                    {/* Summary Footer */}
+                    
                     {cart.length > 0 && (
                         <div style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>

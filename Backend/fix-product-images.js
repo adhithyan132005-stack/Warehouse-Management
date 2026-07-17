@@ -1,12 +1,4 @@
-/**
- * fix-product-images.js
- *
- * Downloads each image via axios (as buffer) then streams to Cloudinary.
- * This bypasses Cloudinary's broken URL-fetch behaviour.
- * Every product type gets a unique, title-matching image.
- *
- * Run: node fix-product-images.js
- */
+
 
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '.env') })
@@ -25,9 +17,7 @@ cloudinary.config({
 
 const Product = mongoose.model('Product', new mongoose.Schema({}, { strict: false }), 'products')
 
-// ── One unique, title-matching Unsplash photo per product ─────────────────────
 const PRODUCT_IMAGES = {
-    // ── FRUITS (all different photos) ─────────────────────────────────────────
     'cavendish banana':     'https://images.unsplash.com/photo-1528825871115-3581a5387919?w=800&q=80&auto=format',
     'honeycrisp apple':     'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800&q=80&auto=format',
     'organic blueberries':  'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=800&q=80&auto=format',
@@ -39,7 +29,6 @@ const PRODUCT_IMAGES = {
     'king alfonso mango':   'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&q=80&auto=format',
     'fresh strawberries':   'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=80&auto=format',
 
-    // ── VEGETABLES (all different photos) ────────────────────────────────────
     'organic carrots':      'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=800&q=80&auto=format',
     'fresh broccoli':       'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=800&q=80&auto=format',
     'roma tomatoes':        'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&q=80&auto=format',
@@ -51,7 +40,6 @@ const PRODUCT_IMAGES = {
     'bell peppers':         'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=800&q=80&auto=format',
     'english cucumber':     'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=800&q=80&auto=format',
 
-    // ── ELECTRONICS (all different photos) ───────────────────────────────────
     'smartphone pro':       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80&auto=format',
     'ultra laptop':         'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80&auto=format',
     'wireless headphones':  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80&auto=format',
@@ -61,20 +49,17 @@ const PRODUCT_IMAGES = {
     'smart watch':          'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80&auto=format',
     'bluetooth speaker':    'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80&auto=format',
 
-    // ── CLOTHING (all different photos) ──────────────────────────────────────
     'cotton t-shirt':       'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&q=80&auto=format',
     'denim jacket':         'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80&auto=format',
     'running shoes':        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80&auto=format',
     'wool sweater':         'https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=800&q=80&auto=format',
 
-    // ── BEAUTY & COSMETICS (all different photos) ─────────────────────────────
     'eyeshadow palette':    'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&q=80&auto=format',
     'lip gloss':            'https://images.unsplash.com/photo-1586495777744-4e6232bf4e47?w=800&q=80&auto=format',
     'night cream':          'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&q=80&auto=format',
     'perfume bottle':       'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80&auto=format',
     'skin serum':           'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80&auto=format',
 
-    // ── FOOD & GROCERY (all different photos) ─────────────────────────────────
     'coffee beans':         'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80&auto=format',
     'pasta noodles':        'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=800&q=80&auto=format',
     'whole milk':           'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=800&q=80&auto=format',
@@ -89,14 +74,13 @@ function getBaseKey(name) {
         .toLowerCase()
 }
 
-// Download image as buffer via axios, then stream-upload to Cloudinary
 async function uploadFromUrl(url, publicId) {
     const res = await axios.get(url, {
         responseType: 'arraybuffer',
         timeout: 20000,
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept':     'image/webp,image/*,*/*;q=0.8',
+            'Accept':     'image/webp,image*;q=0.8',
             'Referer':    'https://unsplash.com'
         }
     })
@@ -127,7 +111,7 @@ async function main() {
     console.log('─'.repeat(72))
 
     let ok = 0, fail = 0
-    const cache = {}  // baseKey → cloudinaryUrl  (reuse for batches)
+    const cache = {}
 
     for (let i = 0; i < products.length; i++) {
         const p       = products[i]
@@ -142,7 +126,6 @@ async function main() {
             continue
         }
 
-        // Same product type → reuse already-uploaded Cloudinary URL
         if (cache[baseKey]) {
             await Product.findByIdAndUpdate(p._id, { image: cache[baseKey] })
             console.log(`♻️  reused`)

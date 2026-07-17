@@ -4,7 +4,6 @@ const Order = require("../Model/order-model")
 
 const queryController = {}
 
-// Create a new query thread for an order
 queryController.createQuery = async (req, res) => {
     try {
         const { orderId, subject, messageText } = req.body
@@ -49,7 +48,6 @@ queryController.createQuery = async (req, res) => {
     }
 }
 
-// Add a message to an existing query thread
 queryController.addMessage = async (req, res) => {
     try {
         const { id } = req.params
@@ -70,14 +68,12 @@ queryController.addMessage = async (req, res) => {
             return res.status(404).json({ error: "Query thread not found" })
         }
 
-        // Check permission: customers can only message on their own tickets, admin/staff can message on any
         if (req.role === "user" && queryThread.userId.toString() !== userId.toString()) {
             return res.status(403).json({ error: "Access denied. This is not your support ticket." })
         }
 
         const senderName = user.username || (req.role === "user" ? "Customer" : "Support")
 
-        // Append new message
         queryThread.messages.push({
             senderId: userId,
             senderName,
@@ -85,7 +81,6 @@ queryController.addMessage = async (req, res) => {
             createdAt: new Date()
         })
 
-        // Reopen ticket if user posts a reply
         if (req.role === "user" && queryThread.status === "Resolved") {
             queryThread.status = "Open"
         }
@@ -100,7 +95,6 @@ queryController.addMessage = async (req, res) => {
     }
 }
 
-// Get queries raised by the logged-in customer
 queryController.getUserQueries = async (req, res) => {
     try {
         const userId = req.userId
@@ -114,7 +108,6 @@ queryController.getUserQueries = async (req, res) => {
     }
 }
 
-// Get all queries (for Admin / Staff members)
 queryController.getAllQueries = async (req, res) => {
     try {
         const queries = await Query.find()
@@ -128,7 +121,6 @@ queryController.getAllQueries = async (req, res) => {
     }
 }
 
-// Update ticket status (Resolve / Reopen - Admin/Staff only)
 queryController.updateStatus = async (req, res) => {
     try {
         const { id } = req.params

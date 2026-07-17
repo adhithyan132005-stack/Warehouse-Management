@@ -52,20 +52,20 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Dynamic Background Elements */}
+      
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-600 opacity-20 blur-[120px]"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#00A19B] opacity-20 blur-[100px]"></div>
 
       <div className="w-full max-w-md z-10 transition-all duration-300">
         
-        {/* Brand Header */}
+        
         <div className="flex flex-col items-center justify-center mb-8">
           <img src="/logo.png" alt="Adhi Warehouse Logo" className="w-20 h-20 mb-4 object-contain drop-shadow-glass" />
           <h1 className="text-3xl font-bold text-white tracking-tight">Adhi Warehouse</h1>
           <p className="text-slate-400 mt-2 text-center text-sm">Sign in to manage inventory, orders, and locations.</p>
         </div>
 
-        {/* Glass Card Form */}
+        
         <div className="bg-slate-900/60 backdrop-blur-md shadow-glass border border-slate-700/50 rounded-2xl p-6 sm:p-8">
           <form onSubmit={handlesubmit} className="space-y-5">
             <div>

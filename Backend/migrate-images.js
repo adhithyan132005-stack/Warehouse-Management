@@ -1,19 +1,3 @@
-/**
- * migrate-images.js
- * ─────────────────────────────────────────────────────────────────────────────
- * WHAT IT DOES:
- *   Scans all products and fixes image URLs in two passes:
- *
- *   Pass 1 — Already-valid external URLs (images.unsplash.com, etc.)
- *     → Uploads them to YOUR Cloudinary so they're permanently owned by you.
- *
- *   Pass 2 — Broken / null / local-path images
- *     → Uses picsum.photos (always works, no API key) to fetch a placeholder,
- *       uploads it to Cloudinary, updates the product.
- *
- * Run once:  node migrate-images.js
- * ─────────────────────────────────────────────────────────────────────────────
- */
 
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
@@ -21,7 +5,6 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const mongoose   = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 
-// ── Cloudinary ────────────────────────────────────────────────────────────────
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key:    process.env.CLOUDINARY_API_KEY,
@@ -29,15 +12,12 @@ cloudinary.config({
     secure:     true
 });
 
-// ── Mongoose Product ──────────────────────────────────────────────────────────
 const productSchema = new mongoose.Schema({}, { strict: false });
 const Product = mongoose.model('Product', productSchema, 'products');
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 const isCloudinary = (url) => url && url.startsWith('https://res.cloudinary.com');
 const isRemoteUrl  = (url) => url && (url.startsWith('https://') || url.startsWith('http://'));
 
-// Category → picsum seed for consistent images per category
 const CATEGORY_SEEDS = {
     'fruits':      10,
     'vegetables':  20,
@@ -55,11 +35,10 @@ const CATEGORY_SEEDS = {
 const getPicsumUrl = (category = '', index = 0) => {
     const cat    = category.toLowerCase().trim();
     const seed   = CATEGORY_SEEDS[cat] || CATEGORY_SEEDS.default;
-    const imgId  = (seed + index) % 1000 + 1; // 1–1000
+    const imgId  = (seed + index) % 1000 + 1;
     return `https://picsum.photos/id/${imgId}/800/800`;
 };
 
-// Upload a remote URL to Cloudinary, return secure_url
 const uploadRemoteUrl = async (remoteUrl, folder, publicId) => {
     const result = await cloudinary.uploader.upload(remoteUrl, {
         folder,
@@ -73,7 +52,6 @@ const uploadRemoteUrl = async (remoteUrl, folder, publicId) => {
 const sanitize = (name) =>
     (name || 'product').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase().slice(0, 40);
 
-// ── Main ──────────────────────────────────────────────────────────────────────
 async function migrate() {
     console.log('\n🔄  Connecting to MongoDB...');
     await mongoose.connect(process.env.DB_URL);
@@ -99,7 +77,6 @@ async function migrate() {
 
     let success = 0, failed = 0;
 
-    // ── Pass 1: upload existing valid URLs into Cloudinary ────────────────────
     if (hasRemoteUrl.length > 0) {
         console.log('─'.repeat(60));
         console.log('📤  Pass 1 — Uploading existing URLs to Cloudinary...\n');
@@ -112,7 +89,7 @@ async function migrate() {
                 await Product.findByIdAndUpdate(p._id, { image: url });
                 console.log(`✅ ${url.slice(0, 70)}…`);
                 success++;
-                await new Promise(r => setTimeout(r, 400)); // rate-limit friendly
+                await new Promise(r => setTimeout(r, 400));
             } catch (err) {
                 console.log(`❌ ${err.message.slice(0, 80)}`);
                 failed++;
@@ -120,7 +97,6 @@ async function migrate() {
         }
     }
 
-    // ── Pass 2: replace broken/null images with picsum → Cloudinary ───────────
     if (broken.length > 0) {
         console.log('\n' + '─'.repeat(60));
         console.log('🖼️   Pass 2 — Replacing broken images via picsum.photos → Cloudinary...\n');

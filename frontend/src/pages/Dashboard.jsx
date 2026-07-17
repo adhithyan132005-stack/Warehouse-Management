@@ -1,35 +1,3 @@
-// import { useEffect } from "react"
-// import { useState } from "react"
-// import RiskTable from "./RiskTableDashboard"
-// import axios from "axios"
-// import CategoryChart from "./categorychartDasboard"
-
-// export default function Dashboard(){
-//     const[data,setData]=useState(null)
-//     useEffect(()=>{
-//         axios.get("https://warehouse-management-backend-t3q2.onrender.com/api/dashboard")
-//         .then((response)=>{
-//             console.log(response.data)
-//             setData(response.data)
-//         })
-//         .catch((err)=>{
-//             console.log(err)
-//         })
-
-//     },[])
-//     if(!data){
-//         return <div>loading...</div>
-//     }
-//     return(
-//         <div>
-//             <h1> Expiry Risk dashboard</h1>
-//             <h2>Total near Expiry :{data.totalNearExpiry}</h2>
-//             <RiskTable stats={data.categoryStatus}/>
-//             <CategoryChart stats={data.categoryStatus ?? {}}/>            
-//         </div>
-//     )
-// }
-
 import { useEffect, useState } from "react"
 import axios from "axios"
 import Notification from "./Notification"
@@ -121,13 +89,12 @@ export default function Dashboard() {
 
     fetchUserOrders()
     
-    // Check if there's a last created order to track
     const lastOrderId = localStorage.getItem('lastOrderId')
     const lastOrderNumber = localStorage.getItem('lastCreatedOrder')
     if (lastOrderId && lastOrderNumber) {
       trackOrder(lastOrderId, lastOrderNumber)
       localStorage.removeItem('lastOrderId')
-      localStorage.removeItem('lastCreatedOrder') // Clear it after showing
+      localStorage.removeItem('lastCreatedOrder')
     }
   }, [])
   if (!data) {
@@ -143,7 +110,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in bg-white text-slate-900 p-6 rounded-3xl shadow-lg shadow-slate-200/40">
-      {/* Header */}
+      
       <header className="glass-card rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white/90 border border-slate-200">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight mb-1 text-sky-500">
@@ -333,7 +300,7 @@ export default function Dashboard() {
                             </div>
                           </div>
 
-                          {/* Timeline */}
+                          
                           {trackingInfo && trackingInfo.length > 0 && (
                              <div className="relative pl-6 border-l-2 border-slate-200 space-y-6 py-2">
                                {trackingInfo

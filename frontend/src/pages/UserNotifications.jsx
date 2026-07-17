@@ -29,7 +29,6 @@ export default function UserNotifications() {
       await axios.put(`https://warehouse-management-backend-t3q2.onrender.com/api/notifications/${notificationId}/read`, {}, {
         headers: { authorization: token }
       })
-      // Update local state
       setNotifications(notifications.map(n =>
         n._id === notificationId ? { ...n, isRead: true } : n
       ))

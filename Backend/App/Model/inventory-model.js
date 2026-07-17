@@ -23,10 +23,7 @@ const inventorySchema = new Schema({
     expiryDate: {
         type: Date
     },
-    // supplierId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Supplier'
-    // }
+
 }, { timestamps: true });
 
 const Inventory = model('Inventory', inventorySchema);

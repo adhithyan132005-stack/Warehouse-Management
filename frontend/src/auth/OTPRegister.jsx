@@ -122,11 +122,11 @@ export default function OTPRegister({ onLogin }) {
       padding: "24px", position: "relative", overflow: "hidden",
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
-      {/* Ambient glows */}
+      
       <div style={{ position:"absolute", top:"-15%", right:"-10%", width:"55%", height:"55%", borderRadius:"50%", background:"radial-gradient(circle, rgba(79,70,229,0.22) 0%, transparent 70%)", pointerEvents:"none" }}/>
       <div style={{ position:"absolute", bottom:"-15%", left:"-10%", width:"50%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(0,161,155,0.18) 0%, transparent 70%)", pointerEvents:"none" }}/>
 
-      {/* Back */}
+      
       <button
         onClick={() => navigate("/")}
         style={{ position:"absolute", top:"24px", left:"24px", background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", color:"#94a3b8", borderRadius:"10px", padding:"8px 14px", fontSize:"14px", cursor:"pointer", display:"flex", alignItems:"center", gap:"6px", zIndex:10 }}
@@ -137,17 +137,17 @@ export default function OTPRegister({ onLogin }) {
       </button>
 
       <div style={{ width:"100%", maxWidth:"420px", position:"relative", zIndex:1, paddingTop:"24px", paddingBottom:"24px" }}>
-        {/* Brand */}
+        
         <div style={{ textAlign:"center", marginBottom:"28px" }}>
           <img src="/logo.png" alt="Logo" style={{ width:"60px", height:"60px", borderRadius:"14px", objectFit:"contain", marginBottom:"14px", boxShadow:"0 8px 32px rgba(79,70,229,0.3)" }}/>
           <h1 style={{ margin:"0 0 6px", fontSize:"26px", fontWeight:800, color:"#ffffff", letterSpacing:"-0.5px", fontFamily:"'Outfit',sans-serif" }}>Create account</h1>
           <p style={{ margin:0, fontSize:"14px", color:"#94a3b8" }}>Join Adhi Warehouse — it's free</p>
         </div>
 
-        {/* Card */}
+        
         <div style={{ background:"rgba(15,20,40,0.85)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"20px", padding:"32px", boxShadow:"0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)", backdropFilter:"blur(20px)" }}>
 
-          {/* Success */}
+          
           {success && (
             <div style={{ display:"flex", alignItems:"center", gap:"10px", background:"rgba(16,185,129,0.12)", border:"1px solid rgba(16,185,129,0.3)", borderRadius:"12px", padding:"12px 14px", marginBottom:"20px", color:"#34d399", fontSize:"14px" }}>
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style={{flexShrink:0}}>
@@ -157,7 +157,7 @@ export default function OTPRegister({ onLogin }) {
             </div>
           )}
 
-          {/* Error */}
+          
           {error && (
             <div style={{ display:"flex", alignItems:"flex-start", gap:"10px", background:"rgba(239,68,68,0.12)", border:"1px solid rgba(239,68,68,0.3)", borderRadius:"12px", padding:"12px 14px", marginBottom:"20px", color:"#f87171", fontSize:"14px" }}>
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style={{marginTop:"1px",flexShrink:0}}>
@@ -169,7 +169,7 @@ export default function OTPRegister({ onLogin }) {
 
           <form onSubmit={handleRegister} noValidate>
 
-            {/* Full Name */}
+            
             <div style={{ marginBottom:"15px" }}>
               <label style={{ display:"block", marginBottom:"7px", fontSize:"13px", fontWeight:600, color:"#cbd5e1" }}>Full Name</label>
               <input
@@ -181,7 +181,7 @@ export default function OTPRegister({ onLogin }) {
               {fieldErrors.username && <p style={{ color:"#f87171", fontSize:"12px", marginTop:"5px" }}>{fieldErrors.username}</p>}
             </div>
 
-            {/* Email */}
+            
             <div style={{ marginBottom:"15px" }}>
               <label style={{ display:"block", marginBottom:"7px", fontSize:"13px", fontWeight:600, color:"#cbd5e1" }}>Email address</label>
               <input
@@ -193,7 +193,7 @@ export default function OTPRegister({ onLogin }) {
               {fieldErrors.email && <p style={{ color:"#f87171", fontSize:"12px", marginTop:"5px" }}>{fieldErrors.email}</p>}
             </div>
 
-            {/* Password */}
+            
             <div style={{ marginBottom:"15px" }}>
               <label style={{ display:"block", marginBottom:"7px", fontSize:"13px", fontWeight:600, color:"#cbd5e1" }}>Password</label>
               <div style={{ position:"relative" }}>
@@ -207,7 +207,7 @@ export default function OTPRegister({ onLogin }) {
                   {showPwd ? <EyeOpen /> : <EyeClosed />}
                 </button>
               </div>
-              {/* Strength */}
+              
               {strength && (
                 <div style={{ marginTop:"8px" }}>
                   <div style={{ height:"4px", background:"rgba(255,255,255,0.1)", borderRadius:"99px", overflow:"hidden" }}>
@@ -219,7 +219,7 @@ export default function OTPRegister({ onLogin }) {
               {fieldErrors.password && <p style={{ color:"#f87171", fontSize:"12px", marginTop:"5px" }}>{fieldErrors.password}</p>}
             </div>
 
-            {/* Confirm Password */}
+            
             <div style={{ marginBottom:"20px" }}>
               <label style={{ display:"block", marginBottom:"7px", fontSize:"13px", fontWeight:600, color:"#cbd5e1" }}>Confirm Password</label>
               <div style={{ position:"relative" }}>
@@ -247,7 +247,7 @@ export default function OTPRegister({ onLogin }) {
               {fieldErrors.confirmPassword && <p style={{ color:"#f87171", fontSize:"12px", marginTop:"5px" }}>{fieldErrors.confirmPassword}</p>}
             </div>
 
-            {/* Submit */}
+            
             <button
               type="submit"
               disabled={loading || gLoading}
@@ -273,14 +273,14 @@ export default function OTPRegister({ onLogin }) {
             </button>
           </form>
 
-          {/* Divider */}
+          
           <div style={{ display:"flex", alignItems:"center", gap:"12px", margin:"22px 0" }}>
             <div style={{ flex:1, height:"1px", background:"rgba(255,255,255,0.1)" }}/>
             <span style={{ fontSize:"11px", color:"#475569", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.8px", whiteSpace:"nowrap" }}>or sign up with</span>
             <div style={{ flex:1, height:"1px", background:"rgba(255,255,255,0.1)" }}/>
           </div>
 
-          {/* Google */}
+          
           <div style={{ display:"flex", justifyContent:"center" }}>
             {gLoading ? (
               <div style={{ display:"flex", alignItems:"center", gap:"8px", color:"#94a3b8", fontSize:"14px", height:"44px" }}>
@@ -303,7 +303,7 @@ export default function OTPRegister({ onLogin }) {
             )}
           </div>
 
-          {/* Footer */}
+          
           <div style={{ marginTop:"22px", paddingTop:"18px", borderTop:"1px solid rgba(255,255,255,0.07)", textAlign:"center", fontSize:"14px", color:"#64748b" }}>
             Already have an account?{" "}
             <button onClick={() => navigate("/login")} style={{ background:"none", border:"none", color:"#00c5be", fontWeight:600, cursor:"pointer", fontSize:"14px" }}>

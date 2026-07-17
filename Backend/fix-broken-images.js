@@ -1,9 +1,4 @@
-/**
- * fix-broken-images.js
- * Finds products whose image is NOT in Cloudinary and replaces them
- * with picsum.photos images uploaded to Cloudinary.
- * Run: node fix-broken-images.js
- */
+
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '.env') })
 
@@ -19,7 +14,6 @@ cloudinary.config({
 
 const Product = mongoose.model('Product', new mongoose.Schema({}, { strict: false }), 'products')
 
-// A set of good picsum photo IDs that look like products
 const PHOTO_IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,
                    210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380]
 
@@ -28,7 +22,6 @@ async function fixBroken() {
     await mongoose.connect(process.env.DB_URL)
     console.log('✅  Connected!\n')
 
-    // Find all products NOT in Cloudinary
     const all = await Product.find({})
     const broken = all.filter(p => !p.image || !p.image.startsWith('https://res.cloudinary.com'))
 
@@ -58,7 +51,6 @@ async function fixBroken() {
             fail++
         }
 
-        // Small pause to be polite to Cloudinary API
         await new Promise(r => setTimeout(r, 300))
     }
 

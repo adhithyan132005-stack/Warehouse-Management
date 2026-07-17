@@ -20,16 +20,14 @@ export default function AddProduct({ close, refresh }) {
     const [error,       setError]       = useState('')
     const [showScanner, setShowScanner] = useState(false)
 
-    // When user picks an image file
     const handleImageChange = (e) => {
         const file = e.target.files[0]
         if (file) {
             setImageFile(file)
-            setPreview(URL.createObjectURL(file))  // show preview
+            setPreview(URL.createObjectURL(file))
         }
     }
 
-    // When barcode is scanned, try to auto-fill product details
     const handleBarcodeScan = async (code) => {
         setShowScanner(false)
         setBarcode(code)
@@ -38,18 +36,15 @@ export default function AddProduct({ close, refresh }) {
             const res = await axios.get(`${BASE_URL}/api/barcode/${code}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
-            // If product found by barcode, fill in the fields
             setName(res.data.name || '')
             setSku(res.data.sku || '')
             setCategory(res.data.category || '')
             setPrice(res.data.price || '')
             setDescription(res.data.description || '')
         } catch {
-            // Product not found — that's okay, user will fill in manually
         }
     }
 
-    // Submit the form
     const handleSubmit = async (e) => {
         e.preventDefault()
 
@@ -64,7 +59,6 @@ export default function AddProduct({ close, refresh }) {
         try {
             const token = localStorage.getItem('token')
 
-            // Use FormData to send text + file together
             const formData = new FormData()
             formData.append('name',        name)
             formData.append('sku',         sku)
@@ -72,11 +66,10 @@ export default function AddProduct({ close, refresh }) {
             formData.append('price',       price)
             formData.append('description', description)
             if (barcode)   formData.append('barcode', barcode)
-            if (imageFile) formData.append('image',   imageFile)   // multer picks this up → uploads to Cloudinary
+            if (imageFile) formData.append('image',   imageFile)
 
             await axios.post(`${BASE_URL}/api/product`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
-                // No need to set Content-Type — axios sets it automatically for FormData
             })
 
             if (refresh) refresh()
@@ -97,7 +90,6 @@ export default function AddProduct({ close, refresh }) {
             boxShadow: '0 25px 60px rgba(0,0,0,0.15)'
         }}>
 
-            {/* Header */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '20px 24px', borderBottom: '1px solid #f1f5f9'
@@ -114,7 +106,6 @@ export default function AddProduct({ close, refresh }) {
 
             <form onSubmit={handleSubmit} style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto' }}>
 
-                {/* Error Message */}
                 {error && (
                     <div style={{
                         background: '#fef2f2', border: '1px solid #fecaca',
@@ -125,7 +116,6 @@ export default function AddProduct({ close, refresh }) {
                     </div>
                 )}
 
-                {/* Image Upload */}
                 <div style={{ marginBottom: '16px' }}>
                     <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>
                         Product Image (optional)
@@ -150,7 +140,6 @@ export default function AddProduct({ close, refresh }) {
                     </label>
                 </div>
 
-                {/* Name + SKU */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                     <div>
                         <label style={labelStyle}>Product Name *</label>
@@ -172,7 +161,6 @@ export default function AddProduct({ close, refresh }) {
                     </div>
                 </div>
 
-                {/* Barcode */}
                 <div style={{ marginBottom: '12px' }}>
                     <label style={labelStyle}>Barcode</label>
                     <div style={{ display: 'flex', gap: '8px' }}>
@@ -196,7 +184,6 @@ export default function AddProduct({ close, refresh }) {
                     </div>
                 </div>
 
-                {/* Category + Price */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                     <div>
                         <label style={labelStyle}>Category *</label>
@@ -219,7 +206,6 @@ export default function AddProduct({ close, refresh }) {
                     </div>
                 </div>
 
-                {/* Description */}
                 <div style={{ marginBottom: '20px' }}>
                     <label style={labelStyle}>Description</label>
                     <textarea
@@ -231,7 +217,6 @@ export default function AddProduct({ close, refresh }) {
                     />
                 </div>
 
-                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={loading}
@@ -247,7 +232,6 @@ export default function AddProduct({ close, refresh }) {
                 </button>
             </form>
 
-            {/* Barcode Scanner Modal */}
             {showScanner && (
                 <div style={{
                     position: 'fixed', inset: 0, zIndex: 999,
@@ -263,7 +247,6 @@ export default function AddProduct({ close, refresh }) {
     )
 }
 
-// Shared styles
 const labelStyle = {
     display: 'block', fontSize: '12px', fontWeight: 700,
     color: '#64748b', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'

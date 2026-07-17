@@ -5,7 +5,6 @@ const BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:4444'
     : 'https://warehouse-management-backend-t3q2.onrender.com'
 
-// Show a placeholder box when image is missing or broken
 const NO_IMAGE = "data:image/svg+xml;utf8," + encodeURIComponent(`
     <svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'>
         <rect width='200' height='200' fill='%23f1f5f9'/>
@@ -18,15 +17,14 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
 
     const [products,   setProducts]   = useState([])
     const [search,     setSearch]     = useState('')
-    const [bigImage,   setBigImage]   = useState(null)   // for image zoom modal
-    const [editProduct,setEditProduct]= useState(null)   // for edit modal
+    const [bigImage,   setBigImage]   = useState(null)
+    const [editProduct,setEditProduct]= useState(null)
     const [editLoading,setEditLoading]= useState(false)
 
     const userRole = localStorage.getItem('role') || 'user'
     const isAdmin  = userRole === 'admin'
     const isStaff  = userRole === 'staff'
 
-    // Load products on mount and when refreshTrigger changes
     useEffect(() => {
         loadProducts()
     }, [refreshTrigger])
@@ -43,7 +41,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
         }
     }
 
-    // Delete a product
     const deleteProduct = async (id) => {
         if (!window.confirm('Delete this product?')) return
         try {
@@ -57,7 +54,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
         }
     }
 
-    // Open edit modal with current product data
     const openEdit = (product) => {
         setEditProduct({
             _id:         product._id,
@@ -67,12 +63,11 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
             price:       product.price       || '',
             description: product.description || '',
             barcode:     product.barcode     || '',
-            image:       product.image       || null,  // current image URL
-            newImageFile:null                          // new image the user picks
+            image:       product.image       || null,
+            newImageFile:null
         })
     }
 
-    // Save edited product
     const saveEdit = async () => {
         if (!editProduct.name || !editProduct.sku || !editProduct.category || !editProduct.price) {
             alert('Name, SKU, Category and Price are required')
@@ -83,7 +78,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
         try {
             const token = localStorage.getItem('token')
 
-            // Use FormData so we can send both text and optional new image
             const formData = new FormData()
             formData.append('name',        editProduct.name)
             formData.append('sku',         editProduct.sku)
@@ -91,7 +85,7 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
             formData.append('price',       editProduct.price)
             formData.append('description', editProduct.description)
             if (editProduct.barcode)     formData.append('barcode', editProduct.barcode)
-            if (editProduct.newImageFile) formData.append('image',  editProduct.newImageFile) // upload new image to cloudinary
+            if (editProduct.newImageFile) formData.append('image',  editProduct.newImageFile)
 
             await axios.put(`${BASE_URL}/api/product/${editProduct._id}`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -106,7 +100,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
         }
     }
 
-    // Filter products by search query
     const filtered = products.filter(p =>
         (p.name     || '').toLowerCase().includes(search.toLowerCase()) ||
         (p.sku      || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -116,7 +109,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
     return (
         <div>
 
-            {/* Search bar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                     <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>All Products</h2>
@@ -134,7 +126,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                 />
             </div>
 
-            {/* Product Cards Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
                 {filtered.length === 0 && (
                     <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
@@ -151,7 +142,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                         transition: 'box-shadow 0.2s',
                     }}>
 
-                        {/* Product Image — click to zoom */}
                         <div
                             onClick={() => setBigImage(p.image)}
                             style={{ height: '180px', overflow: 'hidden', background: '#f8fafc', cursor: 'zoom-in' }}
@@ -164,7 +154,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                             />
                         </div>
 
-                        {/* Product Info */}
                         <div style={{ padding: '14px' }}>
                             <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>{p.name}</h3>
                             <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#94a3b8' }}>SKU: {p.sku}</p>
@@ -179,7 +168,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                                 <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>₹{Number(p.price).toLocaleString()}</span>
                             </div>
 
-                            {/* Edit / Delete — only for admin and staff */}
                             {(isAdmin || isStaff) && (
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     {isAdmin && (
@@ -205,7 +193,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                 ))}
             </div>
 
-            {/* ── Image Zoom Modal ──────────────────────────────────────────── */}
             {bigImage && (
                 <div
                     onClick={() => setBigImage(null)}
@@ -235,7 +222,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                 </div>
             )}
 
-            {/* ── Edit Product Modal ────────────────────────────────────────── */}
             {editProduct && (
                 <div
                     onClick={() => setEditProduct(null)}
@@ -254,7 +240,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                             maxHeight: '90vh', overflowY: 'auto'
                         }}
                     >
-                        {/* Modal Header */}
                         <div style={{
                             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                             padding: '20px 24px', borderBottom: '1px solid #f1f5f9'
@@ -263,10 +248,8 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                             <button onClick={() => setEditProduct(null)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
                         </div>
 
-                        {/* Modal Body */}
                         <div style={{ padding: '24px' }}>
 
-                            {/* Current image + option to change */}
                             <div style={{ marginBottom: '16px' }}>
                                 <label style={labelStyle}>Product Image</label>
                                 <img
@@ -286,7 +269,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                                 </label>
                             </div>
 
-                            {/* Text fields */}
                             {[
                                 { label: 'Name *',      key: 'name' },
                                 { label: 'SKU *',       key: 'sku' },
@@ -314,7 +296,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
                                 </div>
                             ))}
 
-                            {/* Buttons */}
                             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                                 <button
                                     onClick={() => setEditProduct(null)}
@@ -338,7 +319,6 @@ export default function ProductTable({ refreshTrigger, onRefresh }) {
     )
 }
 
-// Shared styles
 const labelStyle = {
     display: 'block', fontSize: '12px', fontWeight: 700, color: '#64748b',
     marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px'

@@ -90,7 +90,7 @@ async function seed() {
                 const itemData = catGroup.items[i % catGroup.items.length];
                 const baseName = itemData.name;
                 const finalName = i < catGroup.items.length ? baseName : `${baseName} (Batch ${Math.floor(i / catGroup.items.length) + 1})`;
-                const finalImage = i < catGroup.items.length ? itemData.img : `${itemData.img}&v=${i}`; // Add variant to cache bust
+                const finalImage = i < catGroup.items.length ? itemData.img : `${itemData.img}&v=${i}`;
                 
                 products.push({
                     name: finalName,

@@ -5,11 +5,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col relative overflow-hidden font-sans">
-      {/* Background Effects */}
+      
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-brand-600 opacity-20 blur-[150px] animate-pulse-slow pointer-events-none"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#00A19B] opacity-20 blur-[120px] pointer-events-none"></div>
 
-      {/* Navbar */}
+      
       <nav className="w-full border-b border-white/10 bg-slate-900/50 backdrop-blur-md z-10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -29,7 +29,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      
       <main className="flex-1 flex flex-col items-center justify-center p-6 z-10 text-center mt-12 md:mt-0">
         <div className="max-w-4xl space-y-8 animate-fade-in-up">
           <span className="inline-block py-1 px-3 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-semibold mb-2">
@@ -52,7 +52,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Feature Cards Grid */}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-24 mb-16 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           
           <div className="bg-slate-900/60 backdrop-blur-md shadow-glass border border-slate-700/50 rounded-2xl p-8 text-left transition-transform hover:-translate-y-2 group">

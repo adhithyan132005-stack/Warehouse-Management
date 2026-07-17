@@ -9,14 +9,12 @@ export default function Queries() {
     const [selectedThread, setSelectedThread] = useState(null);
     const [userOrders, setUserOrders] = useState([]);
     
-    // Form states
     const [newQueryOrderId, setNewQueryOrderId] = useState("");
     const [newQuerySubject, setNewQuerySubject] = useState("");
     const [newQueryMessage, setNewQueryMessage] = useState("");
     const [replyText, setReplyText] = useState("");
-    const [statusFilter, setStatusFilter] = useState("All"); // All, Open, Resolved
+    const [statusFilter, setStatusFilter] = useState("All");
     
-    // Status states
     const [loading, setLoading] = useState(false);
     const [ordersLoading, setOrdersLoading] = useState(false);
     const [sending, setSending] = useState(false);
@@ -27,7 +25,6 @@ export default function Queries() {
     const navigate = useNavigate();
     const routerLocation = useLocation();
 
-    // Dynamic Backend URL
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const BASE_URL = isLocal 
         ? "http://localhost:4444" 
@@ -40,13 +37,11 @@ export default function Queries() {
         }
     }, []);
 
-    // Check if redirecting from dashboard with a pre-selected order
     useEffect(() => {
         if (routerLocation.state?.orderId && userOrders.length > 0) {
             const ordId = routerLocation.state.orderId;
             const ordNum = routerLocation.state.orderNumber;
             
-            // Check if there is already a thread for this order
             const existing = threads.find(t => t.orderId?._id === ordId || t.orderId === ordId);
             if (existing) {
                 setSelectedThread(existing);
@@ -56,12 +51,10 @@ export default function Queries() {
                 setNewQuerySubject(`Inquiry regarding Order #${ordNum}`);
                 setShowNewQueryForm(true);
             }
-            // Clear location state after processing
             window.history.replaceState({}, document.title);
         }
     }, [routerLocation.state, userOrders, threads]);
 
-    // Scroll to bottom of chat when messages change
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [selectedThread?.messages]);
@@ -77,7 +70,6 @@ export default function Queries() {
             });
             setThreads(response.data);
             
-            // If a thread was previously selected, update it with fresh data
             if (selectedThread) {
                 const updated = response.data.find(t => t._id === selectedThread._id);
                 if (updated) setSelectedThread(updated);
@@ -123,13 +115,11 @@ export default function Queries() {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // Reset form
             setNewQueryOrderId("");
             setNewQuerySubject("");
             setNewQueryMessage("");
             setShowNewQueryForm(false);
             
-            // Refresh list and select the new thread
             await fetchThreads();
             setSelectedThread(response.data);
             alert("Support query submitted successfully!");
@@ -157,7 +147,6 @@ export default function Queries() {
             setReplyText("");
             setSelectedThread(response.data);
             
-            // Update thread list with new message
             setThreads(prev => prev.map(t => t._id === response.data._id ? response.data : t));
         } catch (err) {
             console.error("Error sending reply:", err);
@@ -230,7 +219,7 @@ export default function Queries() {
             )}
 
             <div className="flex flex-col lg:flex-row gap-8 items-stretch" style={{ height: '620px' }}>
-                {/* Left Panel: Query Threads List */}
+                
                 <div style={{
                     width: '100%',
                     maxWidth: '350px',
@@ -244,7 +233,7 @@ export default function Queries() {
                 }}>
                     <div className="mb-4">
                         <h3 className="text-base font-bold mb-2">Inquiries</h3>
-                        {/* Filters for Admin/Staff */}
+                        
                         {userRole !== "user" && (
                             <div className="flex gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
                                 {["All", "Open", "Resolved"].map(filter => (
@@ -326,7 +315,7 @@ export default function Queries() {
                     </div>
                 </div>
 
-                {/* Right Panel: Chat Thread or New Query Form */}
+                
                 <div style={{
                     flex: 1,
                     background: 'var(--surface-glass)',
@@ -338,7 +327,7 @@ export default function Queries() {
                     overflow: 'hidden'
                 }}>
                     {showNewQueryForm ? (
-                        /* NEW QUERY FORM */
+                        
                         <form onSubmit={handleCreateQuery} style={{ padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%', overflowY: 'auto' }}>
                             <div className="flex justify-between items-center border-b border-white/10 pb-4">
                                 <h3 className="text-lg font-bold text-white">Create New Inquiry</h3>
@@ -439,9 +428,9 @@ export default function Queries() {
                             </button>
                         </form>
                     ) : selectedThread ? (
-                        /* CHAT CONVERSATION VIEW */
+                        
                         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            {/* Thread Header */}
+                            
                             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
                                 <div style={{ minWidth: 0 }}>
                                     <h3 className="text-base font-bold truncate">{selectedThread.subject}</h3>
@@ -482,7 +471,7 @@ export default function Queries() {
                                 </div>
                             </div>
 
-                            {/* Chat Messages */}
+                            
                             <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }} className="scrollbar-thin">
                                 {selectedThread.messages && selectedThread.messages.map((msg, index) => {
                                     const isMe = msg.senderName === userName || 
@@ -525,7 +514,7 @@ export default function Queries() {
                                 <div ref={chatEndRef} />
                             </div>
 
-                            {/* Reply Input Box */}
+                            
                             <form onSubmit={handleSendReply} style={{ padding: '16px 20px', borderTop: '1px solid var(--border-glass)', display: 'flex', gap: '12px', background: 'rgba(0,0,0,0.15)' }}>
                                 <input
                                     type="text"
@@ -564,7 +553,7 @@ export default function Queries() {
                             </form>
                         </div>
                     ) : (
-                        /* NO THREAD SELECTED STATE */
+                        
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', padding: '40px' }}>
                             <span style={{ fontSize: '3.5rem', opacity: 0.2, marginBottom: '16px' }}>💬</span>
                             <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white', margin: 0 }}>Select an Inquiry</h3>
