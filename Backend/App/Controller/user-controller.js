@@ -59,7 +59,7 @@ Usercltr.Login = async (req, res) => {
         }
 
         const TokenData = { userId: UserPresent._id, role: UserPresent.role }
-        const token = jwt.sign(TokenData, process.env.JWT_SECRET, { expiresIn: '30d' })
+        const token = jwt.sign(TokenData, process.env.JWT_SECRET, { expiresIn: '100d' })
         res.json({ token: token, username: UserPresent.username })
     } catch (err) {
         console.error('CRITICAL ERROR in Login:', {
