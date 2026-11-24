@@ -283,7 +283,7 @@ export default function OTPRegister({ onLogin }) {
 
 
 
-          </div>
+
 
           
           <div style={{ marginTop:"22px", paddingTop:"18px", borderTop:"1px solid rgba(255,255,255,0.07)", textAlign:"center", fontSize:"14px", color:"#64748b" }}>

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const configureDB = async function () {
     try {
-        const dbUrl = process.env.DB_URL;
+        const dbUrl = process.env.DB_URL || process.env.MONGODB_URI || process.env.MONGO_URL;
         if (!dbUrl) {
             throw new Error('DB_URL environment variable is not defined!');
         }
