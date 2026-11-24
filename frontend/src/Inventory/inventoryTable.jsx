@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Loading from "./components/Loading"; // Adjust path if needed
+import Loading from "../components/Loading.jsx";
 
 export default function InventoryTable() {
   const [data, setData] = useState([]);
