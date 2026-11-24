@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import OTPLogin from "./auth/OTPLogin";
+import Register from "./Register";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./layout/layout";
@@ -52,8 +52,8 @@ export default function App() {
       <Suspense fallback={<Loading />}> 
         <Routes>
           <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
+          <Route path="/register" element={<Register />} />
 
-          <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
           <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
           <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />
