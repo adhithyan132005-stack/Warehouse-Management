@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import { GoogleLogin } from "@react-oauth/google"
+// GoogleLogin import removed
 
 const API = "https://warehouse-management-backend-t3q2.onrender.com"
 
@@ -32,7 +32,7 @@ export default function OTPRegister({ onLogin }) {
   const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [gLoading, setGLoading] = useState(false)
+  // gLoading state removed
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [fieldErrors, setFieldErrors] = useState({})
@@ -81,25 +81,7 @@ export default function OTPRegister({ onLogin }) {
     }
   }
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setError("")
-    setGLoading(true)
-    try {
-      const res = await axios.post(`${API}/api/auth/google`, { token: credentialResponse.credential })
-      const token = res.data?.token
-      if (token) {
-        localStorage.setItem("token", token)
-        localStorage.setItem("userName", res.data.username || "Warehouse")
-        localStorage.setItem("role", res.data.role || "user")
-        if (onLogin) onLogin(res.data.role || "user")
-        navigate("/dashboard")
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || "Google sign up failed.")
-    } finally {
-      setGLoading(false)
-    }
-  }
+// Google sign‑up handler removed
 
   const strength = getStrength(form.password)
   const pwdMatch = form.confirmPassword && form.password === form.confirmPassword
@@ -215,7 +197,7 @@ export default function OTPRegister({ onLogin }) {
                   </div>
                   <p style={{ fontSize:"12px", color:strength.color, marginTop:"4px", fontWeight:500 }}>Strength: {strength.label}</p>
                 </div>
-              )}
+  
               {fieldErrors.password && <p style={{ color:"#f87171", fontSize:"12px", marginTop:"5px" }}>{fieldErrors.password}</p>}
             </div>
 
@@ -250,23 +232,23 @@ export default function OTPRegister({ onLogin }) {
             
             <button
               type="submit"
-              disabled={loading || gLoading}
+              disabled={loading}
               style={{
                 width:"100%", padding:"14px",
-                background: (loading || gLoading) ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg, #6366f1, #4f46e5)",
+                background: loading ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg, #6366f1, #4f46e5)",
                 border:"none", borderRadius:"12px", color:"#ffffff",
-                fontSize:"15px", fontWeight:700, cursor:(loading||gLoading)?"not-allowed":"pointer",
+                fontSize:"15px", fontWeight:700, cursor: loading ? "not-allowed" : "pointer",
                 display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
-                boxShadow:(loading||gLoading)?"none":"0 4px 20px rgba(99,102,241,0.35)",
+                boxShadow: loading ? "none" : "0 4px 20px rgba(99,102,241,0.35)",
                 transition:"all 0.2s",
               }}
             >
               {loading ? (
                 <>
-                  <svg style={{animation:"spin 1s linear infinite"}} width="18" height="18" fill="none" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="4"/>
+  
+  
                     <path fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                  </svg>
+  
                   Creating account...
                 </>
               ) : "Create Account"}
@@ -281,26 +263,26 @@ export default function OTPRegister({ onLogin }) {
           </div>
 
           
-          <div style={{ display:"flex", justifyContent:"center" }}>
-            {gLoading ? (
-              <div style={{ display:"flex", alignItems:"center", gap:"8px", color:"#94a3b8", fontSize:"14px", height:"44px" }}>
-                <svg style={{animation:"spin 1s linear infinite"}} width="18" height="18" fill="none" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="4"/>
-                  <path fill="#94a3b8" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
-                Connecting Google...
-              </div>
-            ) : (
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError("Google authentication failed.")}
-                theme="filled_black"
-                size="large"
-                text="signup_with"
-                shape="rectangular"
-                width="348"
-              />
-            )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           </div>
 
           
