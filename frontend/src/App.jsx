@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import Search from "./pages/Search";
 import Queries from "./pages/Queries";
 import Loading from "./components/Loading";
+import Login from "./Login";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
@@ -53,7 +54,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
           <Route path="/register" element={<Register />} />
-
+<Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
           <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />
