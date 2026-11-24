@@ -1,71 +1,75 @@
-import { Routes, Route, Navigate } from "react-router-dom"
-import OTPRegister from "./auth/OTPRegister"
-import OTPLogin from "./auth/OTPLogin"
-import Home from "./pages/Home"
-import Dashboard from "./pages/Dashboard"
-import Layout from "./layout/layout"
-import Inventory from "./Inventory/Inventory"
-import Product from "./product.jsx/productparent"
-import ProtectedRoute from "./assets/ProctedRoute"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import OrderPage from "./orders/orderPage"
-import AddLocation from "./Location/Add-location"
-import OrderTracking from "./pages/OrderTracking"
-import CreateOrder from "./orders/createOrder"
-import Users from "./pages/Users"
-import WarehouseVisualizer from "./pages/WarehouseVisualizer"
-import PaymentPage from "./orders/paymentpage"
-import Settings from "./pages/Settings"
-import Search from "./pages/Search"
-import Queries from "./pages/Queries"
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import OTPRegister from "./auth/OTPRegister";
+import OTPLogin from "./auth/OTPLogin";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Layout from "./layout/layout";
+import Inventory from "./Inventory/Inventory";
+import Product from "./product.jsx/productparent";
+import ProtectedRoute from "./assets/ProctedRoute";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import OrderPage from "./orders/orderPage";
+import AddLocation from "./Location/Add-location";
+import OrderTracking from "./pages/OrderTracking";
+import CreateOrder from "./orders/createOrder";
+import Users from "./pages/Users";
+import WarehouseVisualizer from "./pages/WarehouseVisualizer";
+import PaymentPage from "./orders/paymentpage";
+import Settings from "./pages/Settings";
+import Search from "./pages/Search";
+import Queries from "./pages/Queries";
+import Loading from "./components/Loading";
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'))
-  const [userRole, setUserRole] = useState(localStorage.getItem('role') || "")
-  const navigate = useNavigate()
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [userRole, setUserRole] = useState(localStorage.getItem('role') || "");
+  const navigate = useNavigate();
 
   const handleLogin = (role) => {
-    setIsLoggedIn(true)
-    setUserRole(role || "")
-  }
+    setIsLoggedIn(true);
+    setUserRole(role || "");
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('userName')
-    localStorage.removeItem('role')
-    setIsLoggedIn(false)
-    setUserRole("")
-    navigate("/login")
-  }
+    localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('role');
+    setIsLoggedIn(false);
+    setUserRole("");
+    navigate("/login");
+  };
 
-  const isAdmin = userRole === "admin"
-  const isStaff = userRole === "staff"
-  const canManageInventory = isAdmin || isStaff
-  const canViewProducts = isAdmin || isStaff
-  const canViewOrders = isAdmin || isStaff
+  const isAdmin = userRole === "admin";
+  const isStaff = userRole === "staff";
+  const canManageInventory = isAdmin || isStaff;
+  const canViewProducts = isAdmin || isStaff;
+  const canViewOrders = isAdmin || isStaff;
 
   return (
     <div className="app-root">
-      <Routes>
-        <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
-        <Route path="/register" element={<OTPRegister onLogin={handleLogin} />} />
-        <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
-        <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
-        <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
-        <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />
-        <Route path="/orders" element={<ProtectedRoute isAllowed={isLoggedIn && canViewOrders}><Layout role={userRole}><OrderPage /></Layout></ProtectedRoute>} />
-        <Route path="/create-order" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><CreateOrder /></Layout></ProtectedRoute>} />
-        <Route path="/track-order" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><OrderTracking /></Layout></ProtectedRoute>} />
-        <Route path="/warehouse" element={<ProtectedRoute isAllowed={isLoggedIn && (isAdmin || isStaff)}><Layout role={userRole}><WarehouseVisualizer /></Layout></ProtectedRoute>} />
-        <Route path="/warehouse-3d" element={<ProtectedRoute isAllowed={isLoggedIn && (isAdmin || isStaff)}><Layout role={userRole}><WarehouseVisualizer /></Layout></ProtectedRoute>} />
-        <Route path="/location" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><AddLocation /></Layout></ProtectedRoute>} />
-        <Route path="/users" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><Users /></Layout></ProtectedRoute>} />
-        <Route path="/payment/:id" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><PaymentPage /></Layout></ProtectedRoute>} />
-        <Route path="/queries" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Queries /></Layout></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Settings /></Layout></ProtectedRoute>} />
-        <Route path="/search" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Search /></Layout></ProtectedRoute>} />
-      </Routes>
+      <Suspense fallback={<Loading />}> 
+        <Routes>
+          <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Home />} />
+          <Route path="/register" element={<OTPRegister onLogin={handleLogin} />} />
+          <Route path="/login" element={<OTPLogin onLogin={handleLogin} />} />
+          <Route path="/dashboard" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/product" element={<ProtectedRoute isAllowed={isLoggedIn && canViewProducts}><Layout role={userRole}><Product /></Layout></ProtectedRoute>} />
+          <Route path="/inventory" element={<ProtectedRoute isAllowed={isLoggedIn && canManageInventory}><Layout role={userRole}><Inventory /></Layout></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute isAllowed={isLoggedIn && canViewOrders}><Layout role={userRole}><OrderPage /></Layout></ProtectedRoute>} />
+          <Route path="/create-order" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><CreateOrder /></Layout></ProtectedRoute>} />
+          <Route path="/track-order" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><OrderTracking /></Layout></ProtectedRoute>} />
+          <Route path="/warehouse" element={<ProtectedRoute isAllowed={isLoggedIn && (isAdmin || isStaff)}><Layout role={userRole}><WarehouseVisualizer /></Layout></ProtectedRoute>} />
+          <Route path="/warehouse-3d" element={<ProtectedRoute isAllowed={isLoggedIn && (isAdmin || isStaff)}><Layout role={userRole}><WarehouseVisualizer /></Layout></ProtectedRoute>} />
+          <Route path="/location" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><AddLocation /></Layout></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute isAllowed={isLoggedIn && isAdmin}><Layout role={userRole}><Users /></Layout></ProtectedRoute>} />
+          <Route path="/payment/:id" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><PaymentPage /></Layout></ProtectedRoute>} />
+          <Route path="/queries" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Queries /></Layout></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Settings /></Layout></ProtectedRoute>} />
+          <Route path="/search" element={<ProtectedRoute isAllowed={isLoggedIn}><Layout role={userRole}><Search /></Layout></ProtectedRoute>} />
+        </Routes>
+      </Suspense>
     </div>
-  )
+  );
 }
